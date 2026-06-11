@@ -1,6 +1,7 @@
 // ==================== CONFIGURATION & INITIAL MOCK DATA ====================
 const ADMIN_USERNAME = 'admin';
 const ADMIN_PASSWORD = 'admin';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx-5YfT9K0AD-0z9dyBqVDm2FOxCKS2Hn3rTPgqu09wQK5hURVOt7Bplpjkj3PAa5WxTw/exec';
 
 // Helper to get local date string YYYY-MM-DD
 function getLocalDateString(dateObj = new Date()) {
@@ -82,15 +83,32 @@ const defaultRecords = [
   }
 ];
 
-// Initialize LocalStorage
-if (!localStorage.getItem('borrow_records')) {
-  localStorage.setItem('borrow_records', JSON.stringify(defaultRecords));
+let records = [];
+
+async function loadRecords() {
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, { redirect: 'follow' });
+    const json = await res.json();
+    if (json.status === 'ok' && json.records.length > 0) {
+      records = json.records;
+      localStorage.setItem('borrow_records', JSON.stringify(records));
+      return;
+    }
+  } catch (e) {
+    // ถ้าโหลดจาก Sheets ไม่ได้ ใช้ cache จาก localStorage
+  }
+  const cached = localStorage.getItem('borrow_records');
+  if (cached) {
+    records = JSON.parse(cached);
+  } else {
+    records = defaultRecords;
+    localStorage.setItem('borrow_records', JSON.stringify(records));
+  }
 }
 
-let records = JSON.parse(localStorage.getItem('borrow_records'));
-
 // ==================== APP INITIALIZATION ====================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadRecords();
   initAuth();
   initDashboard();
   initModals();
@@ -482,9 +500,14 @@ function handleSimulateSubmit(e) {
   showToast(`รับแบบฟอร์มการยืมอุปกรณ์จาก ${name} ${surname} เรียบร้อยแล้ว!`, 'success');
 }
 
-// Save back to LocalStorage
+// Save to LocalStorage + sync to Google Sheets
 function saveRecordsToStorage() {
   localStorage.setItem('borrow_records', JSON.stringify(records));
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    redirect: 'follow',
+    body: JSON.stringify({ action: 'saveAll', records })
+  }).catch(() => {});
 }
 
 // ==================== TOAST MESSAGES LOGIC ====================

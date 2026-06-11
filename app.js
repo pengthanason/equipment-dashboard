@@ -106,12 +106,25 @@ async function loadRecords() {
   }
 }
 
+async function refreshFromSheets() {
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, { redirect: 'follow' });
+    const json = await res.json();
+    if (json.status === 'ok' && json.records.length > 0) {
+      records = json.records;
+      localStorage.setItem('borrow_records', JSON.stringify(records));
+      renderDashboardData();
+    }
+  } catch (e) {}
+}
+
 // ==================== APP INITIALIZATION ====================
 document.addEventListener('DOMContentLoaded', async () => {
   await loadRecords();
   initAuth();
   initDashboard();
   initModals();
+  setInterval(refreshFromSheets, 30000);
 });
 
 // ==================== AUTHENTICATION SECTION ====================

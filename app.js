@@ -403,26 +403,38 @@ function closeAllModals() {
   modals.forEach(m => m.classList.remove('open'));
 }
 
+function normalizeDate(val) {
+  if (!val) return '';
+  val = String(val).trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(val)) return val.substring(0, 10);
+  const parts = val.split('/');
+  if (parts.length === 3) {
+    const day = parts[0].padStart(2, '0');
+    const month = parts[1].padStart(2, '0');
+    const year = parts[2].length === 4 ? parts[2] : '20' + parts[2];
+    return `${year}-${month}-${day}`;
+  }
+  return '';
+}
+
 // Open and Prepopulate Edit Modal
 window.openEditModal = function(id) {
   const rec = records.find(r => r.id === id);
   if (!rec) return;
 
-  document.getElementById('edit-id').value = rec.id;
-  document.getElementById('edit-name').value = rec.name;
-  document.getElementById('edit-surname').value = rec.surname;
-  document.getElementById('edit-equipment').value = rec.equipment;
-  document.getElementById('edit-borrow-date').value = rec.borrowDate;
-  document.getElementById('edit-return-date').value = rec.returnDate;
-  document.getElementById('edit-status').value = rec.status;
+  document.getElementById('edit-id').value = rec.id || '';
+  document.getElementById('edit-name').value = rec.name || '';
+  document.getElementById('edit-surname').value = rec.surname || '';
+  document.getElementById('edit-equipment').value = rec.equipment || '';
+  document.getElementById('edit-borrow-date').value = normalizeDate(rec.borrowDate);
+  document.getElementById('edit-return-date').value = normalizeDate(rec.returnDate);
+  document.getElementById('edit-status').value = rec.status || 'กำลังยืม';
   document.getElementById('edit-notes').value = rec.notes || '';
-  
-  // Format ISO timestamp to datetime-local friendly format (YYYY-MM-DDTHH:MM:SS)
-  // Check if timestamp contains seconds, if not add them
+
   let ts = rec.timestamp || '';
   if (ts.length === 10) ts += 'T00:00:00';
   else if (ts.length === 16) ts += ':00';
-  document.getElementById('edit-timestamp').value = ts;
+  document.getElementById('edit-timestamp').value = ts.substring(0, 19);
 
   openModal('edit-modal');
 };

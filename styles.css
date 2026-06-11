@@ -248,13 +248,13 @@ body {
   color: #cbd5e1;
 }
 
-.form-group input:disabled,
-.form-group select:disabled,
-.form-group textarea:disabled {
-  background-color: #f1f5f9;
-  color: #64748b;
-  cursor: not-allowed;
-  border-color: #e2e8f0;
+.field-readonly,
+.form-group input.field-readonly,
+.form-group textarea.field-readonly {
+  background-color: #f1f5f9 !important;
+  color: #64748b !important;
+  cursor: not-allowed !important;
+  border-color: #e2e8f0 !important;
 }
 
 .form-group input:focus,

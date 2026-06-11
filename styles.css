@@ -248,13 +248,19 @@ body {
   color: #cbd5e1;
 }
 
-.field-readonly,
-.form-group input.field-readonly,
-.form-group textarea.field-readonly {
-  background-color: #f1f5f9 !important;
-  color: #64748b !important;
-  cursor: not-allowed !important;
-  border-color: #e2e8f0 !important;
+.field-readonly {
+  width: 100%;
+  padding: 11px 14px;
+  background-color: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-family: inherit;
+  min-height: 42px;
+  box-sizing: border-box;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .form-group input:focus,

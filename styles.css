@@ -248,6 +248,15 @@ body {
   color: #cbd5e1;
 }
 
+.form-group input:disabled,
+.form-group select:disabled,
+.form-group textarea:disabled {
+  background-color: #f1f5f9;
+  color: #64748b;
+  cursor: not-allowed;
+  border-color: #e2e8f0;
+}
+
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {

@@ -422,6 +422,15 @@ function normalizeDate(val) {
     const year = parts[2].length === 4 ? parts[2] : '20' + parts[2];
     return `${year}-${month}-${day}`;
   }
+  try {
+    const d = new Date(val);
+    if (!isNaN(d.getTime())) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+  } catch(e) {}
   return '';
 }
 

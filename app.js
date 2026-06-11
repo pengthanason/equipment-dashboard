@@ -423,18 +423,13 @@ window.openEditModal = function(id) {
   if (!rec) return;
 
   document.getElementById('edit-id').value = rec.id || '';
-  document.getElementById('edit-name').value = rec.name || '';
-  document.getElementById('edit-surname').value = rec.surname || '';
+  document.getElementById('edit-name-display').textContent = `${rec.name || ''} ${rec.surname || ''}`.trim();
+  document.getElementById('edit-borrow-display').textContent = rec.borrowDate ? formatThaiDate(normalizeDate(rec.borrowDate)) : '-';
+  document.getElementById('edit-timestamp-display').textContent = rec.timestamp ? formatThaiDate(rec.timestamp.split('T')[0]) : '-';
+  document.getElementById('edit-notes-display').textContent = rec.notes || '-';
   document.getElementById('edit-equipment').value = rec.equipment || '';
-  document.getElementById('edit-borrow-date').value = normalizeDate(rec.borrowDate);
   document.getElementById('edit-return-date').value = normalizeDate(rec.returnDate);
   document.getElementById('edit-status').value = rec.status || 'กำลังยืม';
-  document.getElementById('edit-notes').value = rec.notes || '';
-
-  let ts = rec.timestamp || '';
-  if (ts.length === 10) ts += 'T00:00:00';
-  else if (ts.length === 16) ts += ':00';
-  document.getElementById('edit-timestamp').value = ts.substring(0, 19);
 
   openModal('edit-modal');
 };
@@ -447,18 +442,9 @@ function handleSaveEdit(e) {
   const index = records.findIndex(r => r.id === id);
   if (index === -1) return;
 
-  // Update object
-  records[index].name = document.getElementById('edit-name').value.trim();
-  records[index].surname = document.getElementById('edit-surname').value.trim();
   records[index].equipment = document.getElementById('edit-equipment').value.trim();
-  records[index].borrowDate = document.getElementById('edit-borrow-date').value;
   records[index].returnDate = document.getElementById('edit-return-date').value;
   records[index].status = document.getElementById('edit-status').value;
-  records[index].notes = document.getElementById('edit-notes').value.trim();
-  
-  // Save custom timestamp
-  const tsVal = document.getElementById('edit-timestamp').value;
-  records[index].timestamp = tsVal;
 
   saveRecordsToStorage();
   closeAllModals();

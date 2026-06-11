@@ -234,48 +234,43 @@
         <div class="modal-body">
           <div class="form-row">
             <div class="form-group col-6">
-              <label for="edit-name">ชื่อ</label>
-              <input type="text" id="edit-name" class="input-readonly" readonly>
+              <label>ชื่อ-นามสกุล</label>
+              <p id="edit-name-display" class="field-display"></p>
             </div>
             <div class="form-group col-6">
-              <label for="edit-surname">นามสกุล</label>
-              <input type="text" id="edit-surname" class="input-readonly" readonly>
+              <label>วันยืม</label>
+              <p id="edit-borrow-display" class="field-display"></p>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group col-6">
-              <label for="edit-borrow-date">วันยืม</label>
-              <input type="date" id="edit-borrow-date" class="input-readonly" readonly>
+              <label>วันเวลาที่ทำรายการ</label>
+              <p id="edit-timestamp-display" class="field-display"></p>
             </div>
             <div class="form-group col-6">
-              <label for="edit-timestamp">วันเวลาที่ทำรายการ</label>
-              <input type="datetime-local" id="edit-timestamp" step="1" class="input-readonly" readonly>
+              <label>หมายเหตุ</label>
+              <p id="edit-notes-display" class="field-display"></p>
             </div>
           </div>
 
           <div class="form-group">
-            <label for="edit-equipment">อุปกรณ์ที่ยืม <span class="editable-hint">✎ แก้ไขได้</span></label>
+            <label for="edit-equipment">อุปกรณ์ที่ยืม</label>
             <input type="text" id="edit-equipment" required>
           </div>
 
           <div class="form-row">
             <div class="form-group col-6">
-              <label for="edit-return-date">วันคืน <span class="editable-hint">✎ แก้ไขได้</span></label>
+              <label for="edit-return-date">วันคืน</label>
               <input type="date" id="edit-return-date" required>
             </div>
             <div class="form-group col-6">
-              <label for="edit-status">สถานะ <span class="editable-hint">✎ แก้ไขได้</span></label>
+              <label for="edit-status">สถานะ</label>
               <select id="edit-status" class="status-select">
                 <option value="กำลังยืม">กำลังยืม</option>
                 <option value="คืนแล้ว">คืนแล้ว</option>
               </select>
             </div>
-          </div>
-
-          <div class="form-group">
-            <label for="edit-notes">หมายเหตุ</label>
-            <textarea id="edit-notes" rows="2" class="input-readonly" readonly></textarea>
           </div>
         </div>
         

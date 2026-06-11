@@ -205,6 +205,14 @@ function initDashboard() {
   // Edit form submit
   const editForm = document.getElementById('edit-form');
   editForm.addEventListener('submit', handleSaveEdit);
+
+  // Table button delegation
+  document.getElementById('records-tbody').addEventListener('click', (e) => {
+    const editBtn = e.target.closest('.btn-action-edit');
+    const deleteBtn = e.target.closest('.btn-action-delete');
+    if (editBtn) openEditModal(editBtn.dataset.id);
+    if (deleteBtn) handleDeleteRecord(deleteBtn.dataset.id);
+  });
 }
 
 // Render Table and Stats
@@ -291,10 +299,10 @@ function renderDashboardData() {
         </td>
         <td style="text-align: center;">
           <div class="table-actions">
-            <button onclick="openEditModal('${rec.id}')" class="btn-action-edit" title="แก้ไข">
+            <button class="btn-action-edit" data-id="${rec.id}" title="แก้ไข">
               <i class="fa-solid fa-pen"></i> แก้ไข
             </button>
-            <button onclick="handleDeleteRecord('${rec.id}')" class="btn-action-delete" title="ลบ">
+            <button class="btn-action-delete" data-id="${rec.id}" title="ลบ">
               <i class="fa-solid fa-trash-can"></i> ลบ
             </button>
           </div>
@@ -353,7 +361,7 @@ function calculateDailyStats() {
 }
 
 // Delete Record
-window.handleDeleteRecord = function(id) {
+function handleDeleteRecord(id) {
   const recordIndex = records.findIndex(r => r.id === id);
   if (recordIndex === -1) return;
 
@@ -418,7 +426,7 @@ function normalizeDate(val) {
 }
 
 // Open and Prepopulate Edit Modal
-window.openEditModal = function(id) {
+function openEditModal(id) {
   const rec = records.find(r => r.id === id);
   if (!rec) return;
 

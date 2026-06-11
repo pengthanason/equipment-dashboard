@@ -419,8 +419,9 @@ window.openEditModal = function(id) {
   
   // Format ISO timestamp to datetime-local friendly format (YYYY-MM-DDTHH:MM:SS)
   // Check if timestamp contains seconds, if not add them
-  let ts = rec.timestamp;
-  if (ts.length === 16) ts += ':00'; // YYYY-MM-DDTHH:MM -> YYYY-MM-DDTHH:MM:SS
+  let ts = rec.timestamp || '';
+  if (ts.length === 10) ts += 'T00:00:00';
+  else if (ts.length === 16) ts += ':00';
   document.getElementById('edit-timestamp').value = ts;
 
   openModal('edit-modal');

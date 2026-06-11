@@ -205,10 +205,6 @@ function initDashboard() {
   // Edit form submit
   const editForm = document.getElementById('edit-form');
   editForm.addEventListener('submit', handleSaveEdit);
-
-  // Simulation form submit
-  const simulateForm = document.getElementById('simulate-form');
-  simulateForm.addEventListener('submit', handleSimulateSubmit);
 }
 
 // Render Table and Stats
@@ -393,27 +389,6 @@ function initModals() {
     });
   });
 
-  // Open Simulate Modal
-  const btnSimulate = document.getElementById('btn-simulate-modal');
-  btnSimulate.addEventListener('click', () => {
-    const today = getLocalDateString();
-    
-    // Set auto default dates
-    document.getElementById('sim-borrow-date').value = today;
-    
-    // Default return date is today + 3 days
-    const nextDate = new Date();
-    nextDate.setDate(nextDate.getDate() + 3);
-    document.getElementById('sim-return-date').value = getLocalDateString(nextDate);
-    
-    openModal('simulate-modal');
-  });
-
-  // Open Guide Modal
-  const btnGuide = document.getElementById('btn-guide-modal');
-  btnGuide.addEventListener('click', () => {
-    openModal('guide-modal');
-  });
 }
 
 function openModal(modalId) {
@@ -478,40 +453,6 @@ function handleSaveEdit(e) {
   showToast('บันทึกการเปลี่ยนแปลงข้อมูลเรียบร้อย', 'success');
 }
 
-// Handle Simulated Google Form Submission
-function handleSimulateSubmit(e) {
-  e.preventDefault();
-
-  const name = document.getElementById('sim-name').value.trim();
-  const surname = document.getElementById('sim-surname').value.trim();
-  const equipment = document.getElementById('sim-equipment').value;
-  const borrowDate = document.getElementById('sim-borrow-date').value;
-  const returnDate = document.getElementById('sim-return-date').value;
-  const notes = document.getElementById('sim-notes').value.trim();
-
-  // Create new record structured like Google Form output
-  const newRecord = {
-    id: 'rec-' + Date.now(),
-    timestamp: getLocalISOString(), // Submitting now
-    name,
-    surname,
-    equipment,
-    borrowDate,
-    returnDate,
-    status: 'กำลังยืม',
-    notes
-  };
-
-  records.push(newRecord);
-  saveRecordsToStorage();
-  
-  // Reset simulation form
-  document.getElementById('simulate-form').reset();
-  
-  closeAllModals();
-  renderDashboardData();
-  showToast(`รับแบบฟอร์มการยืมอุปกรณ์จาก ${name} ${surname} เรียบร้อยแล้ว!`, 'success');
-}
 
 // Save to LocalStorage + sync to Google Sheets
 function saveRecordsToStorage() {

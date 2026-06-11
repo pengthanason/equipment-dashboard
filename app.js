@@ -272,7 +272,7 @@ function renderDashboardData() {
         <td style="font-weight: 600; text-align: center;">${idx + 1}</td>
         <td>
           <div class="timestamp-text">
-            <i class="fa-regular fa-clock"></i> ${formatThaiDateTime(rec.timestamp)}
+            <i class="fa-regular fa-clock"></i> ${formatThaiDate(rec.timestamp.split('T')[0])}
           </div>
         </td>
         <td style="font-weight: 500;">${rec.name} ${rec.surname}</td>

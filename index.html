@@ -234,23 +234,12 @@
         <div class="modal-body">
           <div class="form-row">
             <div class="form-group col-6">
-              <label>ชื่อ-นามสกุล</label>
-              <p id="edit-name-display" class="field-display"></p>
+              <label for="edit-name">ชื่อ</label>
+              <input type="text" id="edit-name" disabled>
             </div>
             <div class="form-group col-6">
-              <label>วันยืม</label>
-              <p id="edit-borrow-display" class="field-display"></p>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group col-6">
-              <label>วันเวลาที่ทำรายการ</label>
-              <p id="edit-timestamp-display" class="field-display"></p>
-            </div>
-            <div class="form-group col-6">
-              <label>หมายเหตุ</label>
-              <p id="edit-notes-display" class="field-display"></p>
+              <label for="edit-surname">นามสกุล</label>
+              <input type="text" id="edit-surname" disabled>
             </div>
           </div>
 
@@ -261,9 +250,16 @@
 
           <div class="form-row">
             <div class="form-group col-6">
+              <label for="edit-borrow-date">วันยืม</label>
+              <input type="date" id="edit-borrow-date" disabled>
+            </div>
+            <div class="form-group col-6">
               <label for="edit-return-date">วันคืน</label>
               <input type="date" id="edit-return-date" required>
             </div>
+          </div>
+
+          <div class="form-row">
             <div class="form-group col-6">
               <label for="edit-status">สถานะ</label>
               <select id="edit-status" class="status-select">
@@ -271,6 +267,15 @@
                 <option value="คืนแล้ว">คืนแล้ว</option>
               </select>
             </div>
+            <div class="form-group col-6">
+              <label for="edit-timestamp">วันเวลาที่ทำรายการ</label>
+              <input type="text" id="edit-timestamp" disabled>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-notes">หมายเหตุ</label>
+            <textarea id="edit-notes" rows="2" disabled></textarea>
           </div>
         </div>
         

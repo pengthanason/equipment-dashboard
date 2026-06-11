@@ -423,13 +423,14 @@ window.openEditModal = function(id) {
   if (!rec) return;
 
   document.getElementById('edit-id').value = rec.id || '';
-  document.getElementById('edit-name-display').textContent = `${rec.name || ''} ${rec.surname || ''}`.trim();
-  document.getElementById('edit-borrow-display').textContent = rec.borrowDate ? formatThaiDate(normalizeDate(rec.borrowDate)) : '-';
-  document.getElementById('edit-timestamp-display').textContent = rec.timestamp ? formatThaiDate(rec.timestamp.split('T')[0]) : '-';
-  document.getElementById('edit-notes-display').textContent = rec.notes || '-';
+  document.getElementById('edit-name').value = rec.name || '';
+  document.getElementById('edit-surname').value = rec.surname || '';
   document.getElementById('edit-equipment').value = rec.equipment || '';
+  document.getElementById('edit-borrow-date').value = normalizeDate(rec.borrowDate);
   document.getElementById('edit-return-date').value = normalizeDate(rec.returnDate);
   document.getElementById('edit-status').value = rec.status || 'กำลังยืม';
+  document.getElementById('edit-timestamp').value = rec.timestamp ? formatThaiDate(rec.timestamp.split('T')[0]) : '';
+  document.getElementById('edit-notes').value = rec.notes || '';
 
   openModal('edit-modal');
 };

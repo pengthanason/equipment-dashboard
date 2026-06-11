@@ -820,6 +820,17 @@ tr:hover td {
   overflow-y: auto;
 }
 
+.input-readonly {
+  background: #f1f5f9;
+  cursor: default;
+  color: #64748b;
+}
+
+.editable-hint {
+  color: var(--primary-color);
+  font-size: 0.8em;
+}
+
 .modal-footer {
   padding: 16px 24px;
   border-top: 1px solid var(--border-color);

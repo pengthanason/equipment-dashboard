@@ -278,7 +278,7 @@ function renderDashboardData() {
         <td style="font-weight: 500;">${rec.name} ${rec.surname}</td>
         <td>
           <div style="font-weight: 500; color: var(--primary-color);">
-            <i class="fa-solid fa-tablet-screen-button"></i> ${rec.equipment}
+            ${rec.equipment}
           </div>
         </td>
         <td>${formatThaiDate(rec.borrowDate)}</td>

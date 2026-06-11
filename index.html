@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบยืม-คืนอุปกรณ์ - Admin Dashboard</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- CSS Styles -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- ==================== LOGIN SCREEN ==================== -->
+  <div id="login-screen" class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-icon-circle">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h2>แอดมินเข้าสู่ระบบ</h2>
+        <p>ระบบจัดการข้อมูลการยืม-คืนอุปกรณ์</p>
+      </div>
+      
+      <form id="login-form" autocomplete="off">
+        <div class="form-group">
+          <label for="username"><i class="fa-regular fa-user"></i> ชื่อผู้ใช้</label>
+          <input type="text" id="username" placeholder="ใส่ชื่อผู้ใช้ (admin)" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="password"><i class="fa-solid fa-lock"></i> รหัสผ่าน</label>
+          <div class="password-input-wrapper">
+            <input type="password" id="password" placeholder="ใส่รหัสผ่าน (admin)" required>
+            <button type="button" id="toggle-password" class="btn-icon">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">
+          <span>เข้าสู่ระบบ</span>
+          <i class="fa-solid fa-arrow-right-to-bracket"></i>
+        </button>
+      </form>
+      <div class="auth-footer">
+        <p><i class="fa-solid fa-info-circle"></i> บันทึกข้อมูลการยืมจะรับเข้าจาก Google Form</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== DASHBOARD SCREEN ==================== -->
+  <div id="dashboard-screen" class="dashboard-wrapper" style="display: none;">
+    
+    <!-- Navigation Sidebar/Topbar -->
+    <header class="navbar">
+      <div class="navbar-brand">
+        <div class="logo-circle">
+          <i class="fa-solid fa-boxes-stacked"></i>
+        </div>
+        <div class="brand-text">
+          <h1>ระบบยืม-คืนอุปกรณ์</h1>
+          <span>แผงควบคุมผู้ดูแลระบบ (Admin)</span>
+        </div>
+      </div>
+      <div class="navbar-actions">
+        <span class="user-badge">
+          <i class="fa-solid fa-user-gear"></i> ผู้ดูแลระบบ
+        </span>
+        <button id="btn-logout" class="btn btn-outline-danger">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>ออกจากระบบ</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="dashboard-content">
+      <!-- Welcome Alert Panel -->
+      <div class="welcome-banner">
+        <div class="banner-icon">
+          <i class="fa-solid fa-circle-info"></i>
+        </div>
+        <div class="banner-text">
+          <h3>ยินดีต้อนรับสู่ระบบจัดการข้อมูลยืม-คืน</h3>
+          <p>ข้อมูลในตารางจะรับเข้าโดยตรงจาก Google Form หรือสามารถสร้างแบบจำลองการยืม และแก้ไขสถานะ วันเวลา ได้ที่หน้าจอนี้</p>
+        </div>
+        <button class="banner-close-btn" onclick="this.parentElement.remove()">&times;</button>
+      </div>
+
+      <!-- ==================== DAILY SUMMARY ==================== -->
+      <section class="summary-section">
+        <div class="section-header">
+          <h2><i class="fa-solid fa-chart-pie"></i> สรุปความเคลื่อนไหวประจำวัน</h2>
+          <span id="current-date" class="date-badge">1 มกราคม 2569</span>
+        </div>
+        
+        <div class="stats-grid">
+          <!-- Card 1: Total Borrows Today -->
+          <div class="stat-card">
+            <div class="stat-icon bg-blue-light">
+              <i class="fa-solid fa-calendar-plus text-blue"></i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">รายการยืมวันนี้</span>
+              <h3 id="stat-borrows-today" class="stat-number">0</h3>
+              <span class="stat-subtext">อัปเดตวันนี้</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Returned Today -->
+          <div class="stat-card">
+            <div class="stat-icon bg-green-light">
+              <i class="fa-solid fa-calendar-check text-green"></i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">ส่งคืนสำเร็จวันนี้</span>
+              <h3 id="stat-returns-today" class="stat-number">0</h3>
+              <span class="stat-subtext">เช็คอินวันนี้</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Currently Borrowed -->
+          <div class="stat-card">
+            <div class="stat-icon bg-yellow-light">
+              <i class="fa-solid fa-hourglass-half text-yellow"></i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">กำลังยืมอยู่ตอนนี้</span>
+              <h3 id="stat-currently-borrowed" class="stat-number">0</h3>
+              <span class="stat-subtext">ค้างส่งคืน</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Overdue Items -->
+          <div class="stat-card">
+            <div class="stat-icon bg-red-light">
+              <i class="fa-solid fa-triangle-exclamation text-red"></i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">เกินกำหนดส่งคืน</span>
+              <h3 id="stat-overdue" class="stat-number">0</h3>
+              <span class="stat-subtext">รายการที่เลยกำหนด</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TABLE RECORDS & CONTROLS ==================== -->
+      <section class="table-section">
+        <div class="table-controls-wrapper">
+          <div class="controls-left">
+            <div class="search-wrapper">
+              <i class="fa-solid fa-magnifying-glass search-icon"></i>
+              <input type="text" id="search-input" placeholder="ค้นหาด้วย ชื่อ, นามสกุล, อุปกรณ์...">
+            </div>
+            
+            <div class="filter-wrapper">
+              <i class="fa-solid fa-filter filter-icon"></i>
+              <select id="status-filter">
+                <option value="all">สถานะทั้งหมด</option>
+                <option value="borrowing">กำลังยืม</option>
+                <option value="returned">คืนแล้ว</option>
+                <option value="overdue">เกินกำหนดส่งคืน</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="controls-right">
+            <button id="btn-simulate-modal" class="btn btn-primary">
+              <i class="fa-solid fa-plus"></i>
+              <span>จำลองส่ง Google Form</span>
+            </button>
+            <button id="btn-guide-modal" class="btn btn-outline">
+              <i class="fa-solid fa-code"></i>
+              <span>เชื่อมต่อ Google Form</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Scrollable Table Card -->
+        <div class="table-card">
+          <div class="table-responsive">
+            <table id="records-table">
+              <thead>
+                <tr>
+                  <th style="width: 60px;">ลำดับ</th>
+                  <th style="width: 160px;">วันเวลาที่ทำรายการ</th>
+                  <th>ชื่อ - นามสกุล</th>
+                  <th>อุปกรณ์ที่ยืม</th>
+                  <th style="width: 120px;">วันยืม</th>
+                  <th style="width: 120px;">วันคืน</th>
+                  <th style="width: 110px; text-align: center;">สถานะ</th>
+                  <th>หมายเหตุ</th>
+                  <th style="width: 130px; text-align: center;">จัดการ</th>
+                </tr>
+              </thead>
+              <tbody id="records-tbody">
+                <!-- Data rows will be injected here via app.js -->
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Empty State -->
+          <div id="empty-state" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">
+              <i class="fa-regular fa-folder-open"></i>
+            </div>
+            <h3>ไม่พบข้อมูลบันทึกการยืม</h3>
+            <p>กรุณาลองเปลี่ยนคำค้นหา หรือกดปุ่ม "จำลองส่ง Google Form" เพื่อทดลองเพิ่มข้อมูล</p>
+          </div>
+          
+          <!-- Table Footer Pagination/Details -->
+          <div class="table-footer">
+            <span id="records-count">แสดงทั้งหมด 0 รายการ</span>
+            <span class="auto-save-tag"><i class="fa-solid fa-cloud-arrow-up"></i> บันทึกข้อมูลอัตโนมัติ (LocalStorage)</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- 1. EDIT RECORD MODAL -->
+  <div id="edit-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-pen-to-square text-blue"></i> แก้ไขข้อมูลบันทึกการยืม</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="edit-form">
+        <input type="hidden" id="edit-id">
+        
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group col-6">
+              <label for="edit-name">ชื่อ</label>
+              <input type="text" id="edit-name" required>
+            </div>
+            <div class="form-group col-6">
+              <label for="edit-surname">นามสกุล</label>
+              <input type="text" id="edit-surname" required>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="edit-equipment">อุปกรณ์ที่ยืม</label>
+            <input type="text" id="edit-equipment" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-6">
+              <label for="edit-borrow-date">วันยืม</label>
+              <input type="date" id="edit-borrow-date" required>
+            </div>
+            <div class="form-group col-6">
+              <label for="edit-return-date">วันคืน</label>
+              <input type="date" id="edit-return-date" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-6">
+              <label for="edit-status">สถานะ</label>
+              <select id="edit-status" class="status-select">
+                <option value="กำลังยืม">กำลังยืม</option>
+                <option value="คืนแล้ว">คืนแล้ว</option>
+              </select>
+            </div>
+            <div class="form-group col-6">
+              <label for="edit-timestamp">วันเวลาที่ทำรายการ (Google Form)</label>
+              <input type="datetime-local" id="edit-timestamp" step="1" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="edit-notes">หมายเหตุ</label>
+            <textarea id="edit-notes" rows="2" placeholder="ใส่ข้อมูลเพิ่มเติม..."></textarea>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline modal-close-btn">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary">บันทึกการเปลี่ยนแปลง</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- 2. SIMULATE GOOGLE FORM SUBMISSION MODAL -->
+  <div id="simulate-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-brands fa-google text-blue"></i> จำลองส่งข้อมูลจาก Google Form</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="simulate-form">
+        <div class="modal-body">
+          <p class="guide-text">
+            จำลองสถานการณ์เมื่อมีผู้ใช้สแกน QR Code หรือตอบแบบฟอร์ม Google Form ของคุณ ข้อมูลจะวิ่งมาแสดงบนหน้าแดชบอร์ดนี้ทันที
+          </p>
+          
+          <div class="form-row">
+            <div class="form-group col-6">
+              <label for="sim-name">ชื่อ (ผู้ยืม)</label>
+              <input type="text" id="sim-name" placeholder="ตัวอย่าง: สมชาย" required>
+            </div>
+            <div class="form-group col-6">
+              <label for="sim-surname">นามสกุล</label>
+              <input type="text" id="sim-surname" placeholder="ตัวอย่าง: ใจดี" required>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="sim-equipment">อุปกรณ์ที่ต้องการยืม</label>
+            <select id="sim-equipment" required>
+              <option value="" disabled selected>เลือกอุปกรณ์...</option>
+              <option value="iPad Pro 11-inch (IT-01)">iPad Pro 11-inch (IT-01)</option>
+              <option value="MacBook Air M2 (IT-04)">MacBook Air M2 (IT-04)</option>
+              <option value="Projector Epson (IT-12)">Projector Epson (IT-12)</option>
+              <option value="Wacom Tablet (IT-08)">Wacom Tablet (IT-08)</option>
+              <option value="Sony Mirrorless Camera (AV-03)">Sony Mirrorless Camera (AV-03)</option>
+              <option value="Wireless Microphone (AV-09)">Wireless Microphone (AV-09)</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-6">
+              <label for="sim-borrow-date">วันยืม</label>
+              <input type="date" id="sim-borrow-date" required>
+            </div>
+            <div class="form-group col-6">
+              <label for="sim-return-date">วันคืน</label>
+              <input type="date" id="sim-return-date" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="sim-notes">หมายเหตุ</label>
+            <input type="text" id="sim-notes" placeholder="เช่น ยืมไปห้องประชุม 301, ใช้งานสัมมนา">
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline modal-close-btn">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> ส่งแบบฟอร์ม</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- 3. GOOGLE FORM CONNECTION GUIDE MODAL -->
+  <div id="guide-modal" class="modal-backdrop">
+    <div class="modal-card modal-large">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-network-wired text-blue"></i> คู่มือการเชื่อมต่อ Google Form เข้ากับระบบ</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="guide-text">
+          ในสถานการณ์การใช้งานจริง คุณสามารถให้แอดมินหรือบุคลากรส่งคำขอผ่าน Google Form และส่งข้อมูลเข้ามาที่แดชบอร์ดนี้ได้โดยทำตามขั้นตอนต่อไปนี้
+        </p>
+
+        <div class="step-guide">
+          <div class="step-item">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h4>สร้าง Google Form และเชื่อม Google Sheet</h4>
+              <p>สร้าง Google Form ที่มีฟิลด์: ชื่อ, นามสกุล, อุปกรณ์ที่ต้องการยืม, วันยืม, วันคืน และหมายเหตุ จากนั้นกดเปิดใช้ Google Sheets เพื่อเก็บคำตอบของแบบฟอร์ม</p>
+            </div>
+          </div>
+          
+          <div class="step-item">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h4>เพิ่ม Google Apps Script</h4>
+              <p>ในหน้า Google Sheets คำตอบ ให้เลือกเมนู <strong>ส่วนขยาย (Extensions) &gt; Apps Script</strong> และนำโค้ดด้านล่างนี้ไปวาง</p>
+              
+              <div class="code-container">
+                <pre><code>function onSubmit(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var row = sheet.getLastRow();
+  
+  // ดึงค่าแถวล่าสุดที่เพิ่งกรอกเข้ามา
+  var timestamp = sheet.getRange(row, 1).getValue();
+  var name      = sheet.getRange(row, 2).getValue();
+  var surname   = sheet.getRange(row, 3).getValue();
+  var equipment = sheet.getRange(row, 4).getValue();
+  var bDate     = sheet.getRange(row, 5).getValue();
+  var rDate     = sheet.getRange(row, 6).getValue();
+  var notes     = sheet.getRange(row, 7).getValue();
+
+  // จัดรูปแบบวันที่
+  var formattedTimestamp = Utilities.formatDate(new Date(timestamp), "GMT+7", "yyyy-MM-dd'T'HH:mm:ss");
+  var formattedBDate = Utilities.formatDate(new Date(bDate), "GMT+7", "yyyy-MM-dd");
+  var formattedRDate = Utilities.formatDate(new Date(rDate), "GMT+7", "yyyy-MM-dd");
+
+  var payload = {
+    "timestamp": formattedTimestamp,
+    "name": name,
+    "surname": surname,
+    "equipment": equipment,
+    "borrowDate": formattedBDate,
+    "returnDate": formattedRDate,
+    "notes": notes,
+    "status": "กำลังยืม"
+  };
+
+  // URL ของ API ปลายทางที่ต้องการส่งไปอัปเดต (Webhook)
+  var webhookUrl = "YOUR_WEBHOOK_URL_HERE";
+  
+  var options = {
+    "method": "post",
+    "contentType": "application/json",
+    "payload": JSON.stringify(payload)
+  };
+  
+  try {
+    UrlFetchApp.fetch(webhookUrl, options);
+  } catch(err) {
+    Logger.log("Error sending: " + err.toString());
+  }
+}</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-item">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h4>ตั้งค่าทริกเกอร์ (Triggers)</h4>
+              <p>ในหน้า Google Apps Script ให้ไปที่เมนู <strong>ทริกเกอร์ (Triggers)</strong> รูปนาฬิกาด้านซ้าย จากนั้นเพิ่มทริกเกอร์ใหม่ โดยตั้งค่าฟังก์ชันที่จะทำงานคือ <code>onSubmit</code> แหล่งข้อมูลคือ <code>จากสเปรดชีต (From spreadsheet)</code> และประเภทเหตุการณ์คือ <code>เมื่อส่งฟอร์ม (On form submit)</code></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary modal-close-btn">เข้าใจแล้ว</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS Logic -->
+  <script src="app.js"></script>
+</body>
+</html>

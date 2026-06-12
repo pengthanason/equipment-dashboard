@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบฟอร์มยืมอุปกรณ์</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans Thai', 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    .form-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 36px 32px;
+      width: 100%;
+      max-width: 580px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+    .form-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .form-header .icon-circle {
+      width: 60px; height: 60px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 12px;
+      font-size: 1.5rem; color: #fff;
+    }
+    .form-header h1 { font-size: 1.4rem; font-weight: 700; color: #1e293b; }
+    .form-header p { color: #64748b; font-size: 0.9rem; margin-top: 4px; }
+    .required-star { color: #ef4444; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 6px;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: #1e293b;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* Items section */
+    .items-section { margin-bottom: 16px; }
+    .items-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .item-row {
+      display: grid;
+      grid-template-columns: 1fr 90px 36px;
+      gap: 8px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+    .item-row input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      color: #1e293b;
+    }
+    .item-row input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+    }
+    .btn-remove {
+      width: 36px; height: 36px;
+      border: none;
+      background: #fee2e2;
+      color: #ef4444;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-remove:hover { background: #fecaca; }
+
+    .btn-add-item {
+      width: 100%;
+      padding: 9px;
+      border: 1.5px dashed #cbd5e1;
+      background: #f8fafc;
+      border-radius: 8px;
+      color: #64748b;
+      font-size: 0.9rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-add-item:hover { border-color: #667eea; color: #667eea; background: #f0f4ff; }
+
+    .btn-submit {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.2s;
+    }
+    .btn-submit:hover { opacity: 0.9; }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* Success screen */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .success-screen .success-icon {
+      width: 70px; height: 70px;
+      background: #dcfce7;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 2rem; color: #16a34a;
+    }
+    .success-screen h2 { color: #1e293b; margin-bottom: 8px; }
+    .success-screen p { color: #64748b; font-size: 0.9rem; margin-bottom: 20px; }
+    .btn-back {
+      display: inline-block;
+      padding: 10px 24px;
+      background: #f1f5f9;
+      color: #374151;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .error-msg {
+      background: #fee2e2;
+      color: #dc2626;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      margin-top: 8px;
+      display: none;
+    }
+
+    /* Mobile: bigger touch targets */
+    .form-group input, .form-group select,
+    .item-row input {
+      min-height: 46px;
+    }
+    .btn-submit { min-height: 50px; font-size: 1.05rem; }
+    .btn-add-item { min-height: 44px; }
+    .btn-remove { width: 42px; height: 42px; min-width: 42px; }
+
+    @media (max-width: 520px) {
+      body { padding: 0; align-items: flex-end; }
+      .form-card {
+        border-radius: 20px 20px 0 0;
+        padding: 24px 20px 32px;
+        max-width: 100%;
+        min-height: unset;
+      }
+      .form-header { margin-bottom: 20px; }
+      .form-header .icon-circle { width: 52px; height: 52px; font-size: 1.3rem; }
+      .form-header h1 { font-size: 1.2rem; }
+      .form-row { grid-template-columns: 1fr; gap: 0; }
+      .item-row { grid-template-columns: 1fr 80px 42px; }
+    }
+
+    @media (max-width: 360px) {
+      .item-row { grid-template-columns: 1fr 70px 42px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-card">
+  <div class="form-header">
+    <div class="icon-circle"><i class="fa-solid fa-boxes-stacked"></i></div>
+    <h1>แบบฟอร์มยืมอุปกรณ์</h1>
+    <p>กรอกข้อมูลให้ครบถ้วนแล้วกดส่งคำขอ</p>
+  </div>
+
+  <!-- Form -->
+  <form id="borrow-form">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="f-name">ชื่อ-นามสกุล <span class="required-star">*</span></label>
+        <input type="text" id="f-name" placeholder="เช่น สมชาย ใจดี" required>
+      </div>
+      <div class="form-group">
+        <label for="f-dept">แผนก <span class="required-star">*</span></label>
+        <input type="text" id="f-dept" placeholder="เช่น IT, การตลาด" required>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="f-borrow-date">วันที่ยืม <span class="required-star">*</span></label>
+        <input type="date" id="f-borrow-date" required>
+      </div>
+      <div class="form-group">
+        <label for="f-return-date">วันที่คืน <span class="required-star">*</span></label>
+        <input type="date" id="f-return-date" required>
+      </div>
+    </div>
+
+    <div class="items-section">
+      <div class="items-label">
+        <i class="fa-solid fa-list-check"></i> รายการอุปกรณ์
+      </div>
+      <div id="items-container">
+        <!-- item rows injected here -->
+      </div>
+      <button type="button" class="btn-add-item" id="btn-add-item">
+        <i class="fa-solid fa-plus"></i> เพิ่มรายการอุปกรณ์
+      </button>
+    </div>
+
+    <div class="form-group">
+      <label for="f-notes">หมายเหตุ</label>
+      <input type="text" id="f-notes" placeholder="เช่น ยืมไปใช้งานห้องประชุม 301">
+    </div>
+
+    <div class="error-msg" id="error-msg"></div>
+    <button type="submit" class="btn-submit" id="btn-submit">
+      <i class="fa-solid fa-paper-plane"></i> ส่งคำขอยืม
+    </button>
+  </form>
+
+  <!-- Success screen -->
+  <div class="success-screen" id="success-screen">
+    <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
+    <h2>ส่งคำขอสำเร็จ!</h2>
+    <p>ข้อมูลการยืมถูกบันทึกแล้ว<br>แอดมินจะตรวจสอบและอัปเดตสถานะให้</p>
+    <button type="button" class="btn-back" id="btn-new-borrow">
+      <i class="fa-solid fa-rotate-left"></i> ยืมรายการใหม่
+    </button>
+  </div>
+</div>
+
+<script>
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyslB1Jv5FeXj5VaGGVeiKqm5rPLAuMg3bUA2riKLbvOQYLcpCAYk08VL5S-X4cAIs2sQ/exec';
+
+  // Set default dates
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function todayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  }
+  document.getElementById('f-borrow-date').value = todayStr();
+  const ret = new Date(); ret.setDate(ret.getDate() + 3);
+  document.getElementById('f-return-date').value = `${ret.getFullYear()}-${pad(ret.getMonth()+1)}-${pad(ret.getDate())}`;
+
+  // Item rows
+  let itemCount = 0;
+
+  function addItemRow() {
+    itemCount++;
+    const container = document.getElementById('items-container');
+    const div = document.createElement('div');
+    div.className = 'item-row';
+    div.dataset.item = itemCount;
+    div.innerHTML = `
+      <input type="text" class="item-name" placeholder="ชื่ออุปกรณ์" required>
+      <input type="number" class="item-qty" min="1" value="1" placeholder="จำนวน">
+      <button type="button" class="btn-remove" onclick="removeItem(this)">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    `;
+    container.appendChild(div);
+  }
+
+  function removeItem(btn) {
+    const rows = document.querySelectorAll('.item-row');
+    if (rows.length <= 1) return;
+    btn.closest('.item-row').remove();
+  }
+
+  document.getElementById('btn-add-item').addEventListener('click', addItemRow);
+  addItemRow(); // start with 1 row
+
+  // Submit
+  document.getElementById('borrow-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errEl = document.getElementById('error-msg');
+    errEl.style.display = 'none';
+
+    const name = document.getElementById('f-name').value.trim();
+    const dept = document.getElementById('f-dept').value.trim();
+    const borrowDate = document.getElementById('f-borrow-date').value;
+    const returnDate = document.getElementById('f-return-date').value;
+    const notes = document.getElementById('f-notes').value.trim();
+
+    // Collect items
+    const rows = document.querySelectorAll('.item-row');
+    const itemParts = [];
+    let valid = true;
+    rows.forEach(row => {
+      const name_ = row.querySelector('.item-name').value.trim();
+      const qty = row.querySelector('.item-qty').value || '1';
+      if (!name_) { valid = false; return; }
+      itemParts.push(`${name_} x${qty}`);
+    });
+
+    if (!valid || itemParts.length === 0) {
+      errEl.textContent = 'กรุณากรอกชื่ออุปกรณ์ให้ครบทุกรายการ';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const equipment = itemParts.join(', ');
+    const btn = document.getElementById('btn-submit');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังส่ง...';
+
+    try {
+      const now = new Date();
+      const timestamp = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+      const record = {
+        id: 'rec-' + Date.now(),
+        timestamp,
+        name,
+        surname: dept,
+        equipment,
+        borrowDate,
+        returnDate,
+        status: 'กำลังยืม',
+        notes
+      };
+
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        redirect: 'follow',
+        body: JSON.stringify({ action: 'addRecord', record })
+      });
+
+      document.getElementById('borrow-form').style.display = 'none';
+      document.getElementById('success-screen').style.display = 'block';
+
+    } catch (err) {
+      errEl.textContent = 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> ส่งคำขอยืม';
+    }
+  });
+
+  document.getElementById('btn-new-borrow').addEventListener('click', () => {
+    document.getElementById('borrow-form').reset();
+    document.getElementById('items-container').innerHTML = '';
+    addItemRow();
+    document.getElementById('f-borrow-date').value = todayStr();
+    document.getElementById('borrow-form').style.display = 'block';
+    document.getElementById('success-screen').style.display = 'none';
+    document.getElementById('btn-submit').disabled = false;
+    document.getElementById('btn-submit').innerHTML = '<i class="fa-solid fa-paper-plane"></i> ส่งคำขอยืม';
+  });
+</script>
+</body>
+</html>

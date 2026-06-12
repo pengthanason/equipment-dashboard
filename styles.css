@@ -1001,7 +1001,7 @@ tr:hover td {
     align-items: flex-start;
     padding: 16px;
   }
-  
+
   .navbar-actions {
     width: 100%;
     justify-content: space-between;
@@ -1012,9 +1012,13 @@ tr:hover td {
     gap: 20px;
   }
 
+  /* 2x2 grid on mobile — easier to scan than 1-col */
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
+  .stat-card { padding: 16px; }
+  .stat-number { font-size: 1.6rem; }
 
   .table-controls-wrapper {
     flex-direction: column;
@@ -1034,6 +1038,13 @@ tr:hover td {
     flex-direction: column;
   }
 
+  /* Bigger touch targets for action buttons */
+  .btn-action-edit,
+  .btn-action-delete {
+    padding: 8px 12px;
+    min-height: 36px;
+  }
+
   .form-row {
     flex-direction: column;
     gap: 0;
@@ -1041,5 +1052,46 @@ tr:hover td {
 
   .col-6 {
     width: 100%;
+  }
+
+  /* Modal: sheet style — slides up from bottom */
+  .modal-card {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: 100%;
+    width: 100%;
+    border-radius: 20px 20px 0 0;
+    max-height: 92vh;
+    margin: 0;
+    transform: translateY(100%);
+  }
+  .modal-backdrop {
+    align-items: flex-end;
+  }
+  .modal-backdrop.open .modal-card {
+    transform: translateY(0) scale(1);
+  }
+  .modal-body {
+    max-height: 65vh;
+  }
+
+  /* Bigger form inputs in modal for touch */
+  .modal-body .form-group input,
+  .modal-body .form-group select,
+  .modal-body .form-group textarea {
+    min-height: 46px;
+    font-size: 1rem;
+  }
+  .modal-body .field-readonly {
+    min-height: 46px;
+    font-size: 1rem;
+  }
+
+  /* Search/filter inputs bigger on mobile */
+  #search-input, #status-filter {
+    min-height: 44px;
+    font-size: 1rem;
   }
 }

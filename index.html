@@ -290,6 +290,14 @@
 
 
 
+  <!-- Photo Lightbox -->
+  <div id="photo-lightbox" class="lightbox-backdrop" onclick="closePhotoLightbox()">
+    <div class="lightbox-content" onclick="event.stopPropagation()">
+      <img id="lightbox-img" class="lightbox-img" src="" alt="">
+      <button type="button" class="lightbox-close" onclick="closePhotoLightbox()">&times;</button>
+    </div>
+  </div>
+
   <!-- JS Logic -->
   <script src="app.js"></script>
 </body>

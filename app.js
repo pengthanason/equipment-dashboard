@@ -215,6 +215,31 @@ function initDashboard() {
   });
 }
 
+// ==================== PHOTO LIGHTBOX ====================
+const photoStore = new Map();
+
+function showPhotoLightbox(key) {
+  const src = photoStore.get(key);
+  if (!src) return;
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('photo-lightbox').classList.add('open');
+}
+
+function closePhotoLightbox() {
+  document.getElementById('photo-lightbox').classList.remove('open');
+  document.getElementById('lightbox-img').src = '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closePhotoLightbox();
+});
+
+// Event delegation for photo-link clicks in the table
+document.addEventListener('click', e => {
+  const link = e.target.closest('.photo-link');
+  if (link && link.dataset.photoKey) showPhotoLightbox(link.dataset.photoKey);
+});
+
 // Render Table and Stats
 function renderDashboardData() {
   const tbody = document.getElementById('records-tbody');
@@ -275,6 +300,37 @@ function renderDashboardData() {
         badgeHtml = `<span class="badge badge-warning"><i class="fa-solid fa-hourglass-half"></i> กำลังยืม</span>`;
       }
 
+      // Register photos in photoStore
+      if (rec.selfiePhoto) {
+        photoStore.set(rec.id + '_selfie', rec.selfiePhoto);
+      }
+      if (rec.equipmentPhotos) {
+        try {
+          const photos = JSON.parse(rec.equipmentPhotos);
+          Object.entries(photos).forEach(([i, data]) => {
+            photoStore.set(rec.id + '_eq_' + i, data);
+          });
+        } catch(e) {}
+      }
+
+      // Name cell — clickable if has selfie
+      const nameHtml = rec.selfiePhoto
+        ? `<span class="photo-link" data-photo-key="${rec.id}_selfie" title="กดดูรูปถ่าย"><i class="fa-solid fa-camera" style="font-size:0.7rem;margin-right:3px;opacity:0.7"></i>${rec.name}</span>`
+        : `<span style="font-weight:500">${rec.name}</span>`;
+
+      // Equipment cell — parse and make individual items clickable if has photo
+      let equipHtml = rec.equipment;
+      if (rec.equipmentPhotos) {
+        try {
+          const photos = JSON.parse(rec.equipmentPhotos);
+          const parts = rec.equipment.split(', ');
+          equipHtml = parts.map((part, i) => photos[i]
+            ? `<span class="photo-link" data-photo-key="${rec.id}_eq_${i}" title="กดดูรูปอุปกรณ์">${part}</span>`
+            : part
+          ).join(', ');
+        } catch(e) {}
+      }
+
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td style="font-weight: 600; text-align: center;">${idx + 1}</td>
@@ -283,11 +339,11 @@ function renderDashboardData() {
             <i class="fa-regular fa-clock"></i> ${formatThaiDate(rec.timestamp.split('T')[0])}
           </div>
         </td>
-        <td style="font-weight: 500;">${rec.name}</td>
+        <td>${nameHtml}</td>
         <td>${rec.surname || '-'}</td>
         <td>
           <div style="font-weight: 500; color: var(--primary-color);">
-            ${rec.equipment}
+            ${equipHtml}
           </div>
         </td>
         <td>${formatThaiDate(rec.borrowDate)}</td>

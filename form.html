@@ -85,7 +85,7 @@
     }
     .item-row {
       display: grid;
-      grid-template-columns: 1fr 90px 36px;
+      grid-template-columns: 1fr 64px 36px 36px;
       gap: 8px;
       margin-bottom: 8px;
       align-items: center;
@@ -115,6 +115,54 @@
       display: flex; align-items: center; justify-content: center;
     }
     .btn-remove:hover { background: #fecaca; }
+
+    .btn-cam-item {
+      width: 36px; height: 36px;
+      border: none;
+      background: #f1f5f9;
+      color: #94a3b8;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s;
+      position: relative;
+    }
+    .btn-cam-item.has-photo { background: #e0e7ff; color: #667eea; }
+    .btn-cam-item:hover { background: #e2e8f0; color: #64748b; }
+
+    /* Selfie section */
+    .selfie-section { margin-bottom: 16px; }
+    .selfie-wrap { display: flex; gap: 10px; align-items: center; }
+    .selfie-preview {
+      position: relative; width: 60px; height: 60px; flex-shrink: 0;
+      display: none;
+    }
+    .selfie-preview img {
+      width: 60px; height: 60px;
+      border-radius: 8px; object-fit: cover;
+      border: 2px solid #667eea;
+    }
+    .btn-clear-photo {
+      position: absolute; top: -6px; right: -6px;
+      width: 20px; height: 20px;
+      background: #ef4444; color: #fff;
+      border: none; border-radius: 50%;
+      cursor: pointer; font-size: 0.6rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .btn-camera-label {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; flex: 1;
+      padding: 10px 16px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      color: #374151; font-size: 0.9rem;
+      font-family: inherit; cursor: pointer;
+      transition: all 0.2s; min-height: 46px;
+    }
+    .btn-camera-label:hover { border-color: #667eea; color: #667eea; background: #f0f4ff; }
 
     .btn-add-item {
       width: 100%;
@@ -194,6 +242,7 @@
     .btn-submit { min-height: 50px; font-size: 1.05rem; }
     .btn-add-item { min-height: 44px; }
     .btn-remove { width: 42px; height: 42px; min-width: 42px; }
+    .btn-cam-item { width: 42px; height: 42px; min-width: 42px; }
 
     @media (max-width: 520px) {
       body { padding: 0; align-items: flex-end; }
@@ -207,11 +256,11 @@
       .form-header .icon-circle { width: 52px; height: 52px; font-size: 1.3rem; }
       .form-header h1 { font-size: 1.2rem; }
       .form-row { grid-template-columns: 1fr; gap: 0; }
-      .item-row { grid-template-columns: 1fr 80px 42px; }
+      .item-row { grid-template-columns: 1fr 58px 42px 42px; }
     }
 
     @media (max-width: 360px) {
-      .item-row { grid-template-columns: 1fr 70px 42px; }
+      .item-row { grid-template-columns: 1fr 52px 38px 38px; }
     }
   </style>
 </head>
@@ -245,6 +294,23 @@
       <div class="form-group">
         <label for="f-return-date">วันที่คืน <span class="required-star">*</span></label>
         <input type="date" id="f-return-date" required>
+      </div>
+    </div>
+
+    <!-- Selfie -->
+    <div class="selfie-section">
+      <div class="items-label">
+        <i class="fa-solid fa-camera-retro"></i> รูปถ่ายผู้ยืม <span style="font-weight:400;color:#94a3b8">(ไม่บังคับ)</span>
+      </div>
+      <div class="selfie-wrap">
+        <div class="selfie-preview" id="selfie-preview">
+          <img id="selfie-img" src="" alt="selfie">
+          <button type="button" class="btn-clear-photo" id="btn-clear-selfie">&times;</button>
+        </div>
+        <label for="selfie-input" class="btn-camera-label">
+          <i class="fa-solid fa-camera"></i> ถ่ายรูปหรือเลือกรูป
+        </label>
+        <input type="file" id="selfie-input" accept="image/*" capture="user" style="display:none">
       </div>
     </div>
 
@@ -295,35 +361,99 @@
   const ret = new Date(); ret.setDate(ret.getDate() + 3);
   document.getElementById('f-return-date').value = `${ret.getFullYear()}-${pad(ret.getMonth()+1)}-${pad(ret.getDate())}`;
 
-  // Item rows
+  // ---- Compress image to JPEG base64 (max 320px, quality 0.5) ----
+  function compressImage(file) {
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const img = new Image();
+        img.onload = () => {
+          const MAX = 320;
+          const ratio = Math.min(MAX / img.width, MAX / img.height, 1);
+          const w = Math.round(img.width * ratio);
+          const h = Math.round(img.height * ratio);
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.5));
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ---- Selfie capture ----
+  let selfieData = '';
+
+  document.getElementById('selfie-input').addEventListener('change', async function() {
+    const file = this.files[0];
+    if (!file) return;
+    selfieData = await compressImage(file);
+    document.getElementById('selfie-img').src = selfieData;
+    document.getElementById('selfie-preview').style.display = 'block';
+  });
+
+  document.getElementById('btn-clear-selfie').addEventListener('click', () => {
+    selfieData = '';
+    document.getElementById('selfie-preview').style.display = 'none';
+    document.getElementById('selfie-img').src = '';
+    document.getElementById('selfie-input').value = '';
+  });
+
+  // ---- Item rows ----
   let itemCount = 0;
 
   function addItemRow() {
     itemCount++;
+    const id = itemCount;
     const container = document.getElementById('items-container');
     const div = document.createElement('div');
     div.className = 'item-row';
-    div.dataset.item = itemCount;
+    div.dataset.item = id;
+    div.dataset.photo = '';
     div.innerHTML = `
       <input type="text" class="item-name" placeholder="ชื่ออุปกรณ์" required>
-      <input type="number" class="item-qty" min="1" value="1" placeholder="จำนวน">
-      <button type="button" class="btn-remove" onclick="removeItem(this)">
+      <input type="number" class="item-qty" min="1" value="1">
+      <button type="button" class="btn-cam-item" title="ถ่ายรูปสิ่งของ">
+        <i class="fa-solid fa-camera"></i>
+      </button>
+      <button type="button" class="btn-remove">
         <i class="fa-solid fa-xmark"></i>
       </button>
+      <input type="file" class="item-file-input" accept="image/*" style="display:none">
     `;
     container.appendChild(div);
   }
 
-  function removeItem(btn) {
-    const rows = document.querySelectorAll('.item-row');
-    if (rows.length <= 1) return;
-    btn.closest('.item-row').remove();
-  }
+  // Event delegation for item rows
+  document.getElementById('items-container').addEventListener('click', e => {
+    const camBtn = e.target.closest('.btn-cam-item');
+    const removeBtn = e.target.closest('.btn-remove');
+    if (camBtn) {
+      camBtn.closest('.item-row').querySelector('.item-file-input').click();
+    }
+    if (removeBtn) {
+      const rows = document.querySelectorAll('.item-row');
+      if (rows.length > 1) removeBtn.closest('.item-row').remove();
+    }
+  });
+
+  document.getElementById('items-container').addEventListener('change', async e => {
+    const fileInput = e.target.closest('.item-file-input');
+    if (!fileInput || !fileInput.files[0]) return;
+    const row = fileInput.closest('.item-row');
+    const compressed = await compressImage(fileInput.files[0]);
+    row.dataset.photo = compressed;
+    const camBtn = row.querySelector('.btn-cam-item');
+    camBtn.classList.add('has-photo');
+    camBtn.title = 'มีรูปแล้ว — กดเพื่อเปลี่ยน';
+  });
 
   document.getElementById('btn-add-item').addEventListener('click', addItemRow);
-  addItemRow(); // start with 1 row
+  addItemRow();
 
-  // Submit
+  // ---- Submit ----
   document.getElementById('borrow-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const errEl = document.getElementById('error-msg');
@@ -335,15 +465,16 @@
     const returnDate = document.getElementById('f-return-date').value;
     const notes = document.getElementById('f-notes').value.trim();
 
-    // Collect items
     const rows = document.querySelectorAll('.item-row');
     const itemParts = [];
+    const equipPhotos = {};
     let valid = true;
-    rows.forEach(row => {
-      const name_ = row.querySelector('.item-name').value.trim();
+    rows.forEach((row, idx) => {
+      const itemName = row.querySelector('.item-name').value.trim();
       const qty = row.querySelector('.item-qty').value || '1';
-      if (!name_) { valid = false; return; }
-      itemParts.push(`${name_} x${qty}`);
+      if (!itemName) { valid = false; return; }
+      itemParts.push(`${itemName} x${qty}`);
+      if (row.dataset.photo) equipPhotos[idx] = row.dataset.photo;
     });
 
     if (!valid || itemParts.length === 0) {
@@ -353,9 +484,9 @@
     }
 
     const equipment = itemParts.join(', ');
-    const btn = document.getElementById('btn-submit');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังส่ง...';
+    const submitBtn = document.getElementById('btn-submit');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> กำลังส่ง...';
 
     try {
       const now = new Date();
@@ -370,7 +501,9 @@
         borrowDate,
         returnDate,
         status: 'กำลังยืม',
-        notes
+        notes,
+        selfiePhoto: selfieData,
+        equipmentPhotos: Object.keys(equipPhotos).length > 0 ? JSON.stringify(equipPhotos) : ''
       };
 
       await fetch(APPS_SCRIPT_URL, {
@@ -385,12 +518,16 @@
     } catch (err) {
       errEl.textContent = 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง';
       errEl.style.display = 'block';
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> ส่งคำขอยืม';
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> ส่งคำขอยืม';
     }
   });
 
   document.getElementById('btn-new-borrow').addEventListener('click', () => {
+    selfieData = '';
+    document.getElementById('selfie-preview').style.display = 'none';
+    document.getElementById('selfie-img').src = '';
+    document.getElementById('selfie-input').value = '';
     document.getElementById('borrow-form').reset();
     document.getElementById('items-container').innerHTML = '';
     addItemRow();

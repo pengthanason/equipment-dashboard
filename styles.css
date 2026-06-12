@@ -993,6 +993,60 @@ tr:hover td {
   }
 }
 
+/* ==================== PHOTO LIGHTBOX ==================== */
+.lightbox-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+}
+.lightbox-backdrop.open {
+  display: flex;
+}
+.lightbox-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+.lightbox-img {
+  max-width: 90vw;
+  max-height: 85vh;
+  border-radius: 12px;
+  display: block;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+}
+.lightbox-close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 32px;
+  height: 32px;
+  background: #fff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Clickable photo links in table */
+.photo-link {
+  cursor: pointer;
+  color: var(--primary-color);
+  font-weight: 500;
+  text-underline-offset: 2px;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: #94a3b8;
+}
+.photo-link:hover { color: var(--primary-hover); }
+
 /* ==================== RESPONSIVE DESIGN ==================== */
 @media (max-width: 768px) {
   .navbar {

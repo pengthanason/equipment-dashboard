@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initAuth();
   initDashboard();
   initModals();
-  setInterval(refreshFromSheets, 30000);
+  setInterval(refreshFromSheets, 10000);
 });
 
 // ==================== AUTHENTICATION SECTION ====================
@@ -521,9 +521,12 @@ function handleSaveEdit(e) {
   const index = records.findIndex(r => r.id === id);
   if (index === -1) return;
 
+  const newStatus = document.getElementById('edit-status').value;
   records[index].equipment = document.getElementById('edit-equipment').value.trim();
-  records[index].returnDate = document.getElementById('edit-return-date').value;
-  records[index].status = document.getElementById('edit-status').value;
+  records[index].status = newStatus;
+  records[index].returnDate = newStatus === 'คืนแล้ว'
+    ? getLocalDateString()
+    : document.getElementById('edit-return-date').value;
   records[index].notes = document.getElementById('edit-notes').value.trim();
 
   saveRecordsToStorage();

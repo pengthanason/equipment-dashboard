@@ -89,7 +89,7 @@ async function loadRecords() {
   try {
     const res = await fetch(APPS_SCRIPT_URL, { redirect: 'follow' });
     const json = await res.json();
-    if (json.status === 'ok' && json.records.length > 0) {
+    if (json.records && json.records.length > 0) {
       records = json.records;
       localStorage.setItem('borrow_records', JSON.stringify(records));
       return;
@@ -110,7 +110,7 @@ async function refreshFromSheets() {
   try {
     const res = await fetch(APPS_SCRIPT_URL, { redirect: 'follow' });
     const json = await res.json();
-    if (json.status === 'ok' && json.records.length > 0) {
+    if (json.records && json.records.length > 0) {
       records = json.records;
       localStorage.setItem('borrow_records', JSON.stringify(records));
       renderDashboardData();

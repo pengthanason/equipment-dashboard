@@ -283,7 +283,8 @@ function renderDashboardData() {
             <i class="fa-regular fa-clock"></i> ${formatThaiDate(rec.timestamp.split('T')[0])}
           </div>
         </td>
-        <td style="font-weight: 500;">${rec.name} ${rec.surname}</td>
+        <td style="font-weight: 500;">${rec.name}</td>
+        <td>${rec.surname || '-'}</td>
         <td>
           <div style="font-weight: 500; color: var(--primary-color);">
             ${rec.equipment}

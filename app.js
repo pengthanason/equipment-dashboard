@@ -328,16 +328,20 @@ function calculateDailyStats() {
   let overdue = 0;
 
   records.forEach(rec => {
-    // 1. Borrows Today (Form submitted today OR borrow date is today)
-    const isSubmittedToday = rec.timestamp.startsWith(currentTodayStr);
-    const isBorrowDateToday = rec.borrowDate === currentTodayStr;
+    const borrowDateNorm = normalizeDate(rec.borrowDate);
+    const returnDateNorm = normalizeDate(rec.returnDate);
+    const timestampDate = rec.timestamp ? String(rec.timestamp).substring(0, 10) : '';
+
+    // 1. Borrows Today
+    const isSubmittedToday = timestampDate === currentTodayStr;
+    const isBorrowDateToday = borrowDateNorm === currentTodayStr;
     if (isSubmittedToday || isBorrowDateToday) {
       borrowsToday++;
     }
 
-    // 2. Returned Today (Returned status AND return date is today)
+    // 2. Returned Today
     const isReturned = rec.status === 'คืนแล้ว';
-    const isReturnDateToday = rec.returnDate === currentTodayStr;
+    const isReturnDateToday = returnDateNorm === currentTodayStr;
     if (isReturned && isReturnDateToday) {
       returnsToday++;
     }
@@ -345,9 +349,9 @@ function calculateDailyStats() {
     // 3. Currently Borrowed
     if (rec.status === 'กำลังยืม') {
       currentlyBorrowed++;
-      
-      // 4. Overdue (status is borrowing AND returnDate has passed today)
-      if (rec.returnDate < currentTodayStr) {
+
+      // 4. Overdue
+      if (returnDateNorm && returnDateNorm < currentTodayStr) {
         overdue++;
       }
     }
@@ -447,7 +451,7 @@ function openEditModal(id) {
   document.getElementById('edit-return-date').value = normalizeDate(rec.returnDate);
   document.getElementById('edit-status').value = rec.status || 'กำลังยืม';
   document.getElementById('edit-timestamp').textContent = rec.timestamp ? formatThaiDate(rec.timestamp.split('T')[0]) : '-';
-  document.getElementById('edit-notes').textContent = rec.notes || '-';
+  document.getElementById('edit-notes').value = rec.notes || '';
 
   openModal('edit-modal');
 };
@@ -463,6 +467,7 @@ function handleSaveEdit(e) {
   records[index].equipment = document.getElementById('edit-equipment').value.trim();
   records[index].returnDate = document.getElementById('edit-return-date').value;
   records[index].status = document.getElementById('edit-status').value;
+  records[index].notes = document.getElementById('edit-notes').value.trim();
 
   saveRecordsToStorage();
   closeAllModals();

@@ -571,6 +571,14 @@ function closeAllModals() {
 function normalizeDate(val) {
   if (!val) return '';
   val = String(val).trim();
+  // ISO datetime from Google Sheets — parse as local date to avoid UTC off-by-one
+  if (/^\d{4}-\d{2}-\d{2}T/.test(val)) {
+    const d = new Date(val);
+    const y = d.getFullYear();
+    const mo = String(d.getMonth() + 1).padStart(2, '0');
+    const dy = String(d.getDate()).padStart(2, '0');
+    return `${y}-${mo}-${dy}`;
+  }
   if (/^\d{4}-\d{2}-\d{2}/.test(val)) return val.substring(0, 10);
   const parts = val.split('/');
   if (parts.length === 3) {
@@ -675,8 +683,9 @@ function showToast(message, type = 'info') {
 // ==================== DATE UTILITY TRANSLATORS ====================
 function formatThaiDate(dateStr) {
   if (!dateStr) return '-';
-  const parts = dateStr.split('-');
-  if (parts.length !== 3) return dateStr;
+  const normalized = normalizeDate(String(dateStr));
+  const parts = normalized.split('-');
+  if (parts.length !== 3) return String(dateStr);
   
   const year = parseInt(parts[0]) + 543;
   const months = [

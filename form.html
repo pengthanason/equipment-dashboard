@@ -500,7 +500,7 @@
         equipment,
         borrowDate,
         returnDate,
-        status: 'กำลังยืม',
+        status: (returnDate && returnDate < `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`) ? 'คืนแล้ว' : 'กำลังยืม',
         notes,
         selfiePhoto: selfieData,
         equipmentPhotos: Object.keys(equipPhotos).length > 0 ? JSON.stringify(equipPhotos) : ''

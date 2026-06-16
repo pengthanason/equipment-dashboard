@@ -24,6 +24,13 @@ function getLocalISOString(dateObj = new Date()) {
 
 const todayStr = getLocalDateString(); // e.g. "2026-06-11"
 
+// Pagination & date filter state
+let currentPage = 1;
+const PAGE_SIZE = 10;
+let filterDateFrom = todayStr;
+let filterDateTo = todayStr;
+let lastFilteredRecords = [];
+
 // Prepopulate data if LocalStorage is empty
 const defaultRecords = [
   {
@@ -189,22 +196,51 @@ function initAuth() {
 
 // ==================== DASHBOARD SECTION ====================
 function initDashboard() {
-  // Current Date display
-  const currentDateElement = document.getElementById('current-date');
-  if (currentDateElement) {
-    currentDateElement.textContent = formatThaiFullDate(new Date());
-  }
+  // Set default date filter = today
+  const today = getLocalDateString();
+  document.getElementById('filter-date-from').value = today;
+  document.getElementById('filter-date-to').value = today;
 
-  // Filters and Search Inputs
+  // Date filter events
+  document.getElementById('filter-date-from').addEventListener('change', e => {
+    filterDateFrom = e.target.value;
+    currentPage = 1;
+    renderDashboardData();
+  });
+  document.getElementById('filter-date-to').addEventListener('change', e => {
+    filterDateTo = e.target.value;
+    currentPage = 1;
+    renderDashboardData();
+  });
+  document.getElementById('btn-today').addEventListener('click', () => {
+    const t = getLocalDateString();
+    filterDateFrom = t; filterDateTo = t;
+    document.getElementById('filter-date-from').value = t;
+    document.getElementById('filter-date-to').value = t;
+    currentPage = 1;
+    renderDashboardData();
+  });
+
+  // Export CSV
+  document.getElementById('btn-export-csv').addEventListener('click', exportToCSV);
+
+  // Pagination
+  document.getElementById('btn-prev-page').addEventListener('click', () => {
+    if (currentPage > 1) { currentPage--; renderDashboardData(); }
+  });
+  document.getElementById('btn-next-page').addEventListener('click', () => {
+    const total = Math.ceil(lastFilteredRecords.length / PAGE_SIZE);
+    if (currentPage < total) { currentPage++; renderDashboardData(); }
+  });
+
+  // Search & status filter
   const searchInput = document.getElementById('search-input');
   const statusFilter = document.getElementById('status-filter');
-
-  searchInput.addEventListener('input', renderDashboardData);
-  statusFilter.addEventListener('change', renderDashboardData);
+  searchInput.addEventListener('input', () => { currentPage = 1; renderDashboardData(); });
+  statusFilter.addEventListener('change', () => { currentPage = 1; renderDashboardData(); });
 
   // Edit form submit
-  const editForm = document.getElementById('edit-form');
-  editForm.addEventListener('submit', handleSaveEdit);
+  document.getElementById('edit-form').addEventListener('submit', handleSaveEdit);
 
   // Table button delegation
   document.getElementById('records-tbody').addEventListener('click', (e) => {
@@ -246,26 +282,22 @@ function renderDashboardData() {
   const searchVal = document.getElementById('search-input').value.toLowerCase().trim();
   const filterVal = document.getElementById('status-filter').value;
   const emptyState = document.getElementById('empty-state');
-  const tableCard = document.querySelector('.table-card');
   const recordsCount = document.getElementById('records-count');
 
-  // Clear tbody
   tbody.innerHTML = '';
 
-  const activeTodayStr = getLocalDateString(); // Current day reference
+  const activeTodayStr = getLocalDateString();
 
-  // Filter records
+  // Filter: search + status + date range
   const filteredRecords = records.filter(rec => {
-    // Search match (Name, Surname, Equipment)
-    const matchesSearch = 
+    const matchesSearch =
       rec.name.toLowerCase().includes(searchVal) ||
       rec.surname.toLowerCase().includes(searchVal) ||
       rec.equipment.toLowerCase().includes(searchVal);
 
-    // Status match
     let matchesStatus = true;
-    const isOverdue = rec.status === 'กำลังยืม' && rec.returnDate < activeTodayStr;
-    
+    const isOverdue = rec.status === 'กำลังยืม' && normalizeDate(rec.returnDate) < activeTodayStr;
+
     if (filterVal === 'borrowing') {
       matchesStatus = rec.status === 'กำลังยืม';
     } else if (filterVal === 'returned') {
@@ -274,28 +306,57 @@ function renderDashboardData() {
       matchesStatus = isOverdue;
     }
 
-    return matchesSearch && matchesStatus;
+    const borrowDateNorm = normalizeDate(rec.borrowDate);
+    const matchesDateRange = borrowDateNorm >= filterDateFrom && borrowDateNorm <= filterDateTo;
+
+    return matchesSearch && matchesStatus && matchesDateRange;
   });
 
-  // Sort: Latest Form Submission (timestamp) first
+  // Sort: Latest timestamp first
   filteredRecords.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-  // Render Rows
-  if (filteredRecords.length === 0) {
-    tbody.innerHTML = '';
+  // Store for export
+  lastFilteredRecords = filteredRecords;
+
+  // Pagination
+  const totalRecords = filteredRecords.length;
+  const totalPages = Math.max(1, Math.ceil(totalRecords / PAGE_SIZE));
+  if (currentPage > totalPages) currentPage = totalPages;
+
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pageRecords = filteredRecords.slice(start, start + PAGE_SIZE);
+
+  // Update pagination UI
+  const paginationWrapper = document.getElementById('pagination-wrapper');
+  const pageInfo = document.getElementById('page-info');
+  const btnPrev = document.getElementById('btn-prev-page');
+  const btnNext = document.getElementById('btn-next-page');
+
+  if (totalPages <= 1) {
+    paginationWrapper.style.display = 'none';
+  } else {
+    paginationWrapper.style.display = 'flex';
+    pageInfo.textContent = `หน้า ${currentPage} / ${totalPages}`;
+    btnPrev.disabled = currentPage <= 1;
+    btnNext.disabled = currentPage >= totalPages;
+  }
+
+  // Render rows
+  if (pageRecords.length === 0) {
     emptyState.style.display = 'flex';
-    recordsCount.textContent = `แสดงทั้งหมด 0 รายการ`;
+    recordsCount.textContent = 'แสดงทั้งหมด 0 รายการ';
   } else {
     emptyState.style.display = 'none';
-    
-    filteredRecords.forEach((rec, idx) => {
-      const isOverdue = rec.status === 'กำลังยืม' && rec.returnDate < activeTodayStr;
-      
+
+    pageRecords.forEach((rec, idx) => {
+      const rowNum = start + idx + 1;
+      const isOverdue = rec.status === 'กำลังยืม' && normalizeDate(rec.returnDate) < activeTodayStr;
+
       let badgeHtml = '';
       if (rec.status === 'คืนแล้ว') {
         badgeHtml = `<span class="badge badge-success"><i class="fa-solid fa-check"></i> คืนแล้ว</span>`;
       } else if (isOverdue) {
-        badgeHtml = `<span class="badge badge-danger"><i class="fa-solid fa-triangle-exclamation"></i> เกืนกำหนด</span>`;
+        badgeHtml = `<span class="badge badge-danger"><i class="fa-solid fa-triangle-exclamation"></i> เกินกำหนด</span>`;
       } else {
         badgeHtml = `<span class="badge badge-warning"><i class="fa-solid fa-hourglass-half"></i> กำลังยืม</span>`;
       }
@@ -318,7 +379,7 @@ function renderDashboardData() {
         ? `<span class="photo-link" data-photo-key="${rec.id}_selfie" title="กดดูรูปถ่าย"><i class="fa-solid fa-camera" style="font-size:0.7rem;margin-right:3px;opacity:0.7"></i>${rec.name}</span>`
         : `<span style="font-weight:500">${rec.name}</span>`;
 
-      // Equipment cell — parse and make individual items clickable if has photo
+      // Equipment cell — make items clickable if has photo
       let equipHtml = rec.equipment;
       if (rec.equipmentPhotos) {
         try {
@@ -333,7 +394,7 @@ function renderDashboardData() {
 
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td style="font-weight: 600; text-align: center;">${idx + 1}</td>
+        <td style="font-weight: 600; text-align: center;">${rowNum}</td>
         <td>
           <div class="timestamp-text">
             <i class="fa-regular fa-clock"></i> ${formatThaiDate(rec.timestamp.split('T')[0])}
@@ -368,45 +429,41 @@ function renderDashboardData() {
       tbody.appendChild(tr);
     });
 
-    recordsCount.textContent = `แสดงทั้งหมด ${filteredRecords.length} รายการ`;
+    recordsCount.textContent = `แสดงทั้งหมด ${totalRecords} รายการ`;
   }
 
-  // Update summaries
   calculateDailyStats();
 }
 
 // Calculate summary stats
 function calculateDailyStats() {
-  const currentTodayStr = getLocalDateString(); // "YYYY-MM-DD"
-  
-  let borrowsToday = 0;
-  let returnsToday = 0;
+  const currentTodayStr = getLocalDateString();
+
+  let borrowsInPeriod = 0;
+  let returnsInPeriod = 0;
   let currentlyBorrowed = 0;
   let overdue = 0;
+
+  const isToday = filterDateFrom === filterDateTo && filterDateFrom === currentTodayStr;
+  const periodLabel = isToday ? 'วันนี้' : 'ในช่วงนี้';
 
   records.forEach(rec => {
     const borrowDateNorm = normalizeDate(rec.borrowDate);
     const returnDateNorm = normalizeDate(rec.returnDate);
-    const timestampDate = rec.timestamp ? String(rec.timestamp).substring(0, 10) : '';
 
-    // 1. Borrows Today
-    const isSubmittedToday = timestampDate === currentTodayStr;
-    const isBorrowDateToday = borrowDateNorm === currentTodayStr;
-    if (isSubmittedToday || isBorrowDateToday) {
-      borrowsToday++;
+    // 1. Borrows in period
+    if (borrowDateNorm >= filterDateFrom && borrowDateNorm <= filterDateTo) {
+      borrowsInPeriod++;
     }
 
-    // 2. Returned Today
-    const isReturned = rec.status === 'คืนแล้ว';
-    const isReturnDateToday = returnDateNorm === currentTodayStr;
-    if (isReturned && isReturnDateToday) {
-      returnsToday++;
+    // 2. Returns in period
+    if (rec.status === 'คืนแล้ว' && returnDateNorm >= filterDateFrom && returnDateNorm <= filterDateTo) {
+      returnsInPeriod++;
     }
 
-    // 3. Currently Borrowed
+    // 3. Currently Borrowed (global, not date-filtered)
     if (rec.status === 'กำลังยืม') {
       currentlyBorrowed++;
-
       // 4. Overdue
       if (returnDateNorm && returnDateNorm < currentTodayStr) {
         overdue++;
@@ -414,11 +471,50 @@ function calculateDailyStats() {
     }
   });
 
-  // Inject UI values
-  document.getElementById('stat-borrows-today').textContent = borrowsToday;
-  document.getElementById('stat-returns-today').textContent = returnsToday;
+  document.getElementById('stat-label-borrows').textContent = `รายการยืม${periodLabel}`;
+  document.getElementById('stat-sub-borrows').textContent = `อัปเดต${periodLabel}`;
+  document.getElementById('stat-label-returns').textContent = `ส่งคืนสำเร็จ${periodLabel}`;
+  document.getElementById('stat-sub-returns').textContent = `เช็คอิน${periodLabel}`;
+
+  document.getElementById('stat-borrows-today').textContent = borrowsInPeriod;
+  document.getElementById('stat-returns-today').textContent = returnsInPeriod;
   document.getElementById('stat-currently-borrowed').textContent = currentlyBorrowed;
   document.getElementById('stat-overdue').textContent = overdue;
+}
+
+// Export filtered records to CSV (UTF-8 BOM for Excel)
+function exportToCSV() {
+  const rows = lastFilteredRecords.length > 0 ? lastFilteredRecords : records;
+  const headers = ['ลำดับ', 'วันเวลาที่ทำรายการ', 'ชื่อ', 'แผนก', 'อุปกรณ์ที่ยืม', 'วันยืม', 'วันคืน', 'สถานะ', 'หมายเหตุ'];
+
+  const esc = val => {
+    const s = String(val === null || val === undefined ? '' : val);
+    return (s.includes(',') || s.includes('"') || s.includes('\n')) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+
+  const csvRows = [headers.join(',')];
+  rows.forEach((rec, i) => {
+    csvRows.push([
+      i + 1,
+      rec.timestamp ? rec.timestamp.substring(0, 10) : '',
+      rec.name,
+      rec.surname,
+      rec.equipment,
+      normalizeDate(rec.borrowDate),
+      normalizeDate(rec.returnDate),
+      rec.status,
+      rec.notes || ''
+    ].map(esc).join(','));
+  });
+
+  const bom = '﻿';
+  const blob = new Blob([bom + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `equipment-borrow-${getLocalDateString()}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // Delete Record

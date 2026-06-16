@@ -97,8 +97,13 @@
       <!-- ==================== DAILY SUMMARY ==================== -->
       <section class="summary-section">
         <div class="section-header">
-          <h2><i class="fa-solid fa-chart-pie"></i> สรุปความเคลื่อนไหวประจำวัน</h2>
-          <span id="current-date" class="date-badge">1 มกราคม 2569</span>
+          <h2><i class="fa-solid fa-chart-pie"></i> สรุปความเคลื่อนไหว</h2>
+          <div class="date-filter-group">
+            <input type="date" id="filter-date-from" class="date-filter-input">
+            <span class="date-filter-sep">ถึง</span>
+            <input type="date" id="filter-date-to" class="date-filter-input">
+            <button type="button" id="btn-today" class="btn-today">วันนี้</button>
+          </div>
         </div>
         
         <div class="stats-grid">
@@ -108,9 +113,9 @@
               <i class="fa-solid fa-calendar-plus text-blue"></i>
             </div>
             <div class="stat-info">
-              <span class="stat-label">รายการยืมวันนี้</span>
+              <span class="stat-label" id="stat-label-borrows">รายการยืมวันนี้</span>
               <h3 id="stat-borrows-today" class="stat-number">0</h3>
-              <span class="stat-subtext">อัปเดตวันนี้</span>
+              <span class="stat-subtext" id="stat-sub-borrows">อัปเดตวันนี้</span>
             </div>
           </div>
 
@@ -120,9 +125,9 @@
               <i class="fa-solid fa-calendar-check text-green"></i>
             </div>
             <div class="stat-info">
-              <span class="stat-label">ส่งคืนสำเร็จวันนี้</span>
+              <span class="stat-label" id="stat-label-returns">ส่งคืนสำเร็จวันนี้</span>
               <h3 id="stat-returns-today" class="stat-number">0</h3>
-              <span class="stat-subtext">เช็คอินวันนี้</span>
+              <span class="stat-subtext" id="stat-sub-returns">เช็คอินวันนี้</span>
             </div>
           </div>
 
@@ -173,6 +178,9 @@
           </div>
           
           <div class="controls-right">
+            <button type="button" id="btn-export-csv" class="btn btn-outline">
+              <i class="fa-solid fa-file-csv"></i> Export Excel
+            </button>
           </div>
         </div>
 
@@ -209,10 +217,21 @@
             <p>กรุณาลองเปลี่ยนคำค้นหา หรือรอข้อมูลจาก Google Form</p>
           </div>
           
-          <!-- Table Footer Pagination/Details -->
+          <!-- Table Footer -->
           <div class="table-footer">
             <span id="records-count">แสดงทั้งหมด 0 รายการ</span>
             <span class="auto-save-tag"><i class="fa-solid fa-cloud-arrow-up"></i> ซิงค์กับ Google Sheets อัตโนมัติ</span>
+          </div>
+
+          <!-- Pagination -->
+          <div id="pagination-wrapper" class="pagination-wrapper">
+            <button type="button" id="btn-prev-page" class="btn-page">
+              <i class="fa-solid fa-chevron-left"></i> ก่อนหน้า
+            </button>
+            <span id="page-info" class="page-info">หน้า 1 / 1</span>
+            <button type="button" id="btn-next-page" class="btn-page">
+              ถัดไป <i class="fa-solid fa-chevron-right"></i>
+            </button>
           </div>
         </div>
       </section>

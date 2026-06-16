@@ -993,6 +993,74 @@ tr:hover td {
   }
 }
 
+/* ==================== DATE FILTER ==================== */
+.date-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.date-filter-input {
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  color: var(--text-dark);
+  background: #fff;
+  cursor: pointer;
+}
+.date-filter-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--input-focus);
+}
+.date-filter-sep { color: var(--text-muted); font-size: 0.85rem; }
+.btn-today {
+  background: var(--primary-light);
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  color: var(--primary-color);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+.btn-today:hover { background: var(--primary-color); color: #fff; }
+
+/* ==================== PAGINATION ==================== */
+.pagination-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border-color);
+}
+.btn-page {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  color: var(--text-main);
+  font-size: 0.875rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.btn-page:hover:not(:disabled) {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+.btn-page:disabled { opacity: 0.35; cursor: not-allowed; }
+.page-info { color: var(--text-muted); font-size: 0.9rem; min-width: 80px; text-align: center; }
+
 /* ==================== PHOTO LIGHTBOX ==================== */
 .lightbox-backdrop {
   display: none;

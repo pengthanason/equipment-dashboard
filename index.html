@@ -98,12 +98,6 @@
       <section class="summary-section">
         <div class="section-header">
           <h2><i class="fa-solid fa-chart-pie"></i> สรุปความเคลื่อนไหว</h2>
-          <div class="date-filter-group">
-            <input type="date" id="filter-date-from" class="date-filter-input">
-            <span class="date-filter-sep">ถึง</span>
-            <input type="date" id="filter-date-to" class="date-filter-input">
-            <button type="button" id="btn-today" class="btn-today">วันนี้</button>
-          </div>
         </div>
         
         <div class="stats-grid">
@@ -178,6 +172,12 @@
           </div>
           
           <div class="controls-right">
+            <div class="date-filter-group">
+              <input type="date" id="filter-date-from" class="date-filter-input">
+              <span class="date-filter-sep">ถึง</span>
+              <input type="date" id="filter-date-to" class="date-filter-input">
+              <button type="button" id="btn-today" class="btn-today">วันนี้</button>
+            </div>
             <button type="button" id="btn-export-csv" class="btn btn-outline">
               <i class="fa-solid fa-file-csv"></i> Export Excel
             </button>

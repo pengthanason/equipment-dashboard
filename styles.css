@@ -378,10 +378,11 @@ body {
 
 /* Welcome Alert Banner */
 .welcome-banner {
-  background: linear-gradient(90deg, #dbeafe 0%, #eff6ff 100%);
-  border-left: 5px solid var(--primary-color);
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--primary-color);
   border-radius: var(--radius-sm);
-  padding: 18px 24px;
+  padding: 14px 20px;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -390,20 +391,20 @@ body {
 }
 
 .banner-icon {
-  font-size: 1.5rem;
-  color: var(--primary-hover);
+  font-size: 1.3rem;
+  color: var(--primary-color);
 }
 
 .banner-text h3 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--primary-hover);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-dark);
   margin-bottom: 2px;
 }
 
 .banner-text p {
-  font-size: 0.9rem;
-  color: #0369a1;
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 
 .banner-close-btn {

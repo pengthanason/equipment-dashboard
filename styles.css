@@ -1,9 +1,9 @@
 /* ==================== GLOBAL STYLES & RESET ==================== */
 :root {
-  --primary-color: #0284c7;     /* Sky 600 */
-  --primary-hover: #0369a1;     /* Sky 700 */
-  --primary-light: #e0f2fe;     /* Sky 100 */
-  --primary-bg: #f0f9ff;        /* Sky 50 */
+  --primary-color: #3b82f6;     /* Blue 500 — matches MES */
+  --primary-hover: #2563eb;     /* Blue 600 */
+  --primary-light: #eff6ff;     /* Blue 50 */
+  --primary-bg: #f1f5f9;        /* Slate 100 — matches MES body bg */
   
   --bg-dark-gray: #0f172a;      /* Slate 900 */
   --text-main: #334155;         /* Slate 700 */
@@ -23,7 +23,7 @@
   --danger-text: #b91c1c;       /* Red 700 */
 
   --border-color: #e2e8f0;      /* Slate 200 */
-  --input-focus: #bae6fd;       /* Sky 200 */
+  --input-focus: #bfdbfe;       /* Blue 200 */
   
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
@@ -303,8 +303,8 @@ body {
 
 /* Navbar */
 .navbar {
-  background-color: #ffffff;
-  border-bottom: 1px solid var(--border-color);
+  background-color: #162d4a;
+  border-bottom: 1px solid #0f2744;
   padding: 16px 32px;
   display: flex;
   justify-content: space-between;
@@ -324,8 +324,8 @@ body {
 .logo-circle {
   width: 44px;
   height: 44px;
-  background-color: var(--primary-light);
-  color: var(--primary-color);
+  background-color: rgba(255,255,255,0.12);
+  color: #fff;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -336,13 +336,13 @@ body {
 .brand-text h1 {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--text-dark);
+  color: #ffffff;
   line-height: 1.2;
 }
 
 .brand-text span {
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.6);
 }
 
 .navbar-actions {
@@ -352,13 +352,13 @@ body {
 }
 
 .user-badge {
-  background-color: var(--primary-bg);
-  border: 1px solid var(--border-color);
+  background-color: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--primary-color);
+  color: rgba(255,255,255,0.85);
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -378,7 +378,7 @@ body {
 
 /* Welcome Alert Banner */
 .welcome-banner {
-  background: linear-gradient(90deg, #bae6fd 0%, #e0f2fe 100%);
+  background: linear-gradient(90deg, #dbeafe 0%, #eff6ff 100%);
   border-left: 5px solid var(--primary-color);
   border-radius: var(--radius-sm);
   padding: 18px 24px;

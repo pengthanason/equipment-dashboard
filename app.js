@@ -143,8 +143,15 @@ function initAuth() {
   const togglePassword = document.getElementById('toggle-password');
   const passwordInput = document.getElementById('password');
 
+  // Auto-login when embedded in iframe (MES already handles auth)
+  const inIframe = window.self !== window.top;
+  if (inIframe) {
+    sessionStorage.setItem('admin_logged_in', 'true');
+    document.querySelector('.navbar')?.style.setProperty('display', 'none');
+  }
+
   // Check login state
-  const isLoggedIn = sessionStorage.getItem('admin_logged_in') === 'true';
+  const isLoggedIn = inIframe || sessionStorage.getItem('admin_logged_in') === 'true';
   if (isLoggedIn) {
     loginScreen.style.display = 'none';
     dashboardScreen.style.display = 'flex';

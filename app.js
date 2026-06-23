@@ -69,6 +69,7 @@ async function refreshFromSheets() {
   try {
     const res = await fetch(APPS_SCRIPT_URL, { redirect: 'follow' });
     const json = await res.json();
+    if (isSaving) return; // เช็คซ้ำหลัง fetch resolve เผื่อ delete เริ่มระหว่างที่รอ
     if (json.records && json.records.length > 0) {
       records = deduplicateRecords(json.records);
       localStorage.setItem('borrow_records', JSON.stringify(records));

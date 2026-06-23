@@ -479,18 +479,18 @@ function exportToCSV() {
 }
 
 // Delete Record
-function handleDeleteRecord(id) {
+async function handleDeleteRecord(id) {
   const recordIndex = records.findIndex(r => r.id === id);
   if (recordIndex === -1) return;
 
   const target = records[recordIndex];
   const confirmMsg = `คุณต้องการลบบันทึกการยืมของ "${target.name} ${target.surname}" ที่ยืม "${target.equipment}" ใช่หรือไม่?`;
-  
+
   if (confirm(confirmMsg)) {
     records.splice(recordIndex, 1);
-    saveRecordsToStorage();
     renderDashboardData();
     showToast('ลบบันทึกสำเร็จแล้ว', 'success');
+    await saveRecordsToStorage();
   }
 };
 
@@ -580,7 +580,7 @@ function openEditModal(id) {
 };
 
 // Handle Save Edit Form
-function handleSaveEdit(e) {
+async function handleSaveEdit(e) {
   e.preventDefault();
 
   const id = document.getElementById('edit-id').value;
@@ -596,21 +596,25 @@ function handleSaveEdit(e) {
     : document.getElementById('edit-return-date').value;
   records[index].notes = document.getElementById('edit-notes').value.trim();
 
-  saveRecordsToStorage();
   closeAllModals();
   renderDashboardData();
   showToast('บันทึกการเปลี่ยนแปลงข้อมูลเรียบร้อย', 'success');
+  await saveRecordsToStorage();
 }
 
 
 // Save to LocalStorage + sync to Google Sheets
-function saveRecordsToStorage() {
+async function saveRecordsToStorage() {
+  isSaving = true;
   localStorage.setItem('borrow_records', JSON.stringify(records));
-  fetch(APPS_SCRIPT_URL, {
-    method: 'POST',
-    redirect: 'follow',
-    body: JSON.stringify({ action: 'saveAll', records })
-  }).catch(() => {});
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      redirect: 'follow',
+      body: JSON.stringify({ action: 'saveAll', records })
+    });
+  } catch(e) {}
+  isSaving = false;
 }
 
 // ==================== TOAST MESSAGES LOGIC ====================

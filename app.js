@@ -31,73 +31,25 @@ let filterDateFrom = todayStr;
 let filterDateTo = todayStr;
 let lastFilteredRecords = [];
 
-// Prepopulate data if LocalStorage is empty
-const defaultRecords = [
-  {
-    id: 'rec-1',
-    timestamp: '2026-06-11T10:15:30',
-    name: 'สมเกียรติ',
-    surname: 'รักษ์ดี',
-    equipment: 'iPad Pro 11-inch (IT-01)',
-    borrowDate: '2026-06-11',
-    returnDate: '2026-06-14',
-    status: 'กำลังยืม',
-    notes: 'ยืมใช้งานทดสอบระบบแอปพลิเคชันห้องประชุมใหญ่'
-  },
-  {
-    id: 'rec-2',
-    timestamp: '2026-06-11T09:05:12',
-    name: 'กานดา',
-    surname: 'แสนทวี',
-    equipment: 'Sony Mirrorless Camera (AV-03)',
-    borrowDate: '2026-06-08',
-    returnDate: '2026-06-11',
-    status: 'คืนแล้ว',
-    notes: 'นำถ่ายทำวีดีโอสรุปโครงการประจำปี'
-  },
-  {
-    id: 'rec-3',
-    timestamp: '2026-06-10T14:20:45',
-    name: 'วิชัย',
-    surname: 'บุญมี',
-    equipment: 'MacBook Air M2 (IT-04)',
-    borrowDate: '2026-06-07',
-    returnDate: '2026-06-10',
-    status: 'กำลังยืม',
-    notes: 'ยืมพัฒนาเว็บสำหรับงานจัดแสดงสัมมนา (เกินกำหนดคืน)'
-  },
-  {
-    id: 'rec-4',
-    timestamp: '2026-06-09T11:45:00',
-    name: 'นภาพร',
-    surname: 'โชคดี',
-    equipment: 'Projector Epson (IT-12)',
-    borrowDate: '2026-06-09',
-    returnDate: '2026-06-09',
-    status: 'คืนแล้ว',
-    notes: 'ใช้บรรยายวิชาสัมมนาวิชาการภาคบ่าย'
-  },
-  {
-    id: 'rec-5',
-    timestamp: '2026-06-11T13:30:00',
-    name: 'ชลทิศ',
-    surname: 'ศรีสว่าง',
-    equipment: 'Wireless Microphone (AV-09)',
-    borrowDate: '2026-06-11',
-    returnDate: '2026-06-15',
-    status: 'กำลังยืม',
-    notes: 'ยืมทำกิจกรรมสันทนาการของพนักงานในออฟฟิศ'
-  }
-];
 
 let records = [];
+let isSaving = false;
+
+function deduplicateRecords(recs) {
+  const seen = new Set();
+  return recs.filter(r => {
+    if (!r.id || seen.has(r.id)) return false;
+    seen.add(r.id);
+    return true;
+  });
+}
 
 async function loadRecords() {
   try {
     const res = await fetch(APPS_SCRIPT_URL, { redirect: 'follow' });
     const json = await res.json();
     if (json.records && json.records.length > 0) {
-      records = json.records;
+      records = deduplicateRecords(json.records);
       localStorage.setItem('borrow_records', JSON.stringify(records));
       return;
     }
@@ -106,19 +58,19 @@ async function loadRecords() {
   }
   const cached = localStorage.getItem('borrow_records');
   if (cached) {
-    records = JSON.parse(cached);
+    records = deduplicateRecords(JSON.parse(cached));
   } else {
-    records = defaultRecords;
-    localStorage.setItem('borrow_records', JSON.stringify(records));
+    records = [];
   }
 }
 
 async function refreshFromSheets() {
+  if (isSaving) return;
   try {
     const res = await fetch(APPS_SCRIPT_URL, { redirect: 'follow' });
     const json = await res.json();
     if (json.records && json.records.length > 0) {
-      records = json.records;
+      records = deduplicateRecords(json.records);
       localStorage.setItem('borrow_records', JSON.stringify(records));
       renderDashboardData();
     }

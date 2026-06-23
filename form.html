@@ -286,6 +286,11 @@
       </div>
     </div>
 
+    <div class="form-group">
+      <label for="f-email">อีเมล (สำหรับรับแจ้งเตือนวันคืน) <span class="required-star">*</span></label>
+      <input type="email" id="f-email" placeholder="เช่น somchai@company.com" required>
+    </div>
+
     <div class="form-row">
       <div class="form-group">
         <label for="f-borrow-date">วันที่ยืม <span class="required-star">*</span></label>
@@ -327,8 +332,8 @@
     </div>
 
     <div class="form-group">
-      <label for="f-notes">หมายเหตุ</label>
-      <input type="text" id="f-notes" placeholder="เช่น ยืมไปใช้งานห้องประชุม 301">
+      <label for="f-notes">หมายเหตุ <span class="required-star">*</span></label>
+      <input type="text" id="f-notes" placeholder="เช่น ยืมไปใช้งานห้องประชุม 301" required>
     </div>
 
     <div class="error-msg" id="error-msg"></div>
@@ -461,6 +466,7 @@
 
     const name = document.getElementById('f-name').value.trim();
     const dept = document.getElementById('f-dept').value.trim();
+    const email = document.getElementById('f-email').value.trim();
     const borrowDate = document.getElementById('f-borrow-date').value;
     const returnDate = document.getElementById('f-return-date').value;
     const notes = document.getElementById('f-notes').value.trim();
@@ -497,6 +503,7 @@
         timestamp,
         name,
         surname: dept,
+        email,
         equipment,
         borrowDate,
         returnDate,

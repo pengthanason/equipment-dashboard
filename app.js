@@ -409,6 +409,7 @@ function renderDashboardData() {
         </td>
         <td class="col-name" title="${rec.name}">${nameHtml}</td>
         <td>${rec.surname || '-'}</td>
+        <td style="font-size:0.82rem;color:var(--text-muted)">${rec.email || '-'}</td>
         <td>
           <div style="font-weight: 500; color: var(--primary-color);">
             ${equipHtml}
@@ -492,7 +493,7 @@ function calculateDailyStats() {
 // Export filtered records to CSV (UTF-8 BOM for Excel)
 function exportToCSV() {
   const rows = lastFilteredRecords.length > 0 ? lastFilteredRecords : records;
-  const headers = ['ลำดับ', 'วันเวลาที่ทำรายการ', 'ชื่อ', 'แผนก', 'อุปกรณ์ที่ยืม', 'วันยืม', 'วันคืน', 'สถานะ', 'หมายเหตุ'];
+  const headers = ['ลำดับ', 'วันเวลาที่ทำรายการ', 'ชื่อ', 'แผนก', 'อีเมล', 'อุปกรณ์ที่ยืม', 'วันยืม', 'วันคืน', 'สถานะ', 'หมายเหตุ'];
 
   const esc = val => {
     const s = String(val === null || val === undefined ? '' : val);
@@ -506,6 +507,7 @@ function exportToCSV() {
       rec.timestamp ? rec.timestamp.substring(0, 10) : '',
       rec.name,
       rec.surname,
+      rec.email || '',
       rec.equipment,
       normalizeDate(rec.borrowDate),
       normalizeDate(rec.returnDate),
@@ -614,6 +616,7 @@ function openEditModal(id) {
   document.getElementById('edit-id').value = rec.id || '';
   document.getElementById('edit-name').textContent = rec.name || '-';
   document.getElementById('edit-surname').textContent = rec.surname || '-';
+  document.getElementById('edit-email').value = rec.email || '';
   document.getElementById('edit-equipment').value = rec.equipment || '';
   document.getElementById('edit-borrow-date').textContent = rec.borrowDate ? formatThaiDate(normalizeDate(rec.borrowDate)) : '-';
   document.getElementById('edit-return-date').value = normalizeDate(rec.returnDate);
@@ -633,6 +636,7 @@ function handleSaveEdit(e) {
   if (index === -1) return;
 
   const newStatus = document.getElementById('edit-status').value;
+  records[index].email = document.getElementById('edit-email').value.trim();
   records[index].equipment = document.getElementById('edit-equipment').value.trim();
   records[index].status = newStatus;
   records[index].returnDate = newStatus === 'คืนแล้ว'

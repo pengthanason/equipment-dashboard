@@ -1,7 +1,7 @@
 // ==================== CONFIGURATION & INITIAL MOCK DATA ====================
 const ADMIN_USERNAME = 'admin';
 const ADMIN_PASSWORD = 'admin';
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxETpN-KpYyEK0imYj15V1k8IhVpvIj2IiRe44VBsK22q7pvUIcaDhN53wUE5OCDbwJZQ/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzUGmIvYaW1vgGV6C-ACYRum0Gw2RGz4hZOauD0wtQSMsilkPmGI5ww_EBPOE0IPIdW7A/exec';
 
 // Helper to get local date string YYYY-MM-DD
 function getLocalDateString(dateObj = new Date()) {

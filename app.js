@@ -488,10 +488,22 @@ async function handleDeleteRecord(id) {
   const confirmMsg = `คุณต้องการลบบันทึกการยืมของ "${target.name} ${target.surname}" ที่ยืม "${target.equipment}" ใช่หรือไม่?`;
 
   if (confirm(confirmMsg)) {
+    isSaving = true;
     records.splice(recordIndex, 1);
+    localStorage.setItem('borrow_records', JSON.stringify(records));
     renderDashboardData();
-    showToast('ลบบันทึกสำเร็จแล้ว', 'success');
-    await saveRecordsToStorage();
+    showToast('กำลังลบ...', 'info');
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        redirect: 'follow',
+        body: JSON.stringify({ action: 'deleteRecord', id })
+      });
+      showToast('ลบบันทึกสำเร็จแล้ว', 'success');
+    } catch(e) {
+      showToast('ลบเฉพาะในเครื่อง (network error)', 'warning');
+    }
+    isSaving = false;
   }
 };
 
